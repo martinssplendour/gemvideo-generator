@@ -1,0 +1,7 @@
+Flask
+google-genai
+numpy
+opencv-python
+openai
+pyttsx3
+python-dotenv

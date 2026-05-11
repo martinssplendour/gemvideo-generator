@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+data/
+output/
+uploads/
+tmp*/
+.tmp_test/
+zz_test_dir/
+*.mp4
+*.log
+

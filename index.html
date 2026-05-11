@@ -1,0 +1,2959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Builder V2</title>
+    <style>
+        :root {
+            --bg: #0f1218;
+            --panel: #1a2130;
+            --panel-2: #222c3f;
+            --text: #e6edf8;
+            --muted: #9fb0ce;
+            --accent: #f8c244;
+            --accent-2: #4dd3c9;
+            --danger: #ff6f61;
+            --border: #33415a;
+            --radius: 10px;
+            --space: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 10%, #1c2538 0%, #0f1218 42%, #0b0f15 100%);
+            color: var(--text);
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .workflow-layout {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 300px 1fr 420px;
+        }
+
+        .home-page {
+            min-height: 100vh;
+            padding: 26px clamp(20px, 4vw, 52px) 54px;
+        }
+
+        .home-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 34px;
+        }
+
+        .home-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            color: #fff2c5;
+        }
+
+        .home-hero {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .home-eyebrow {
+            color: var(--accent-2);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .home-title {
+            color: #f5f8ff;
+            font-size: clamp(1.7rem, 4vw, 2.8rem);
+            line-height: 1.08;
+            margin-bottom: 12px;
+        }
+
+        .home-copy {
+            color: #bdd0ef;
+            max-width: 760px;
+            margin-bottom: 14px;
+            line-height: 1.5;
+        }
+
+        .home-card {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            background: linear-gradient(180deg, #1a2232 0%, #111a28 100%);
+        }
+
+        .home-card h3 {
+            margin-bottom: 10px;
+            color: #eef4ff;
+            font-size: 1rem;
+        }
+
+        .home-card p {
+            color: #b5c7e5;
+            line-height: 1.45;
+            font-size: 0.9rem;
+        }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin: 12px 0 20px;
+        }
+
+        .home-cta {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            background: linear-gradient(180deg, #1f2436 0%, #141a27 100%);
+        }
+
+        .home-single-video {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 14px;
+            margin: 0 0 22px;
+        }
+
+        .single-video-form textarea {
+            min-height: 140px;
+        }
+
+        .single-video-result {
+            min-height: 100%;
+        }
+
+        .single-video-meta {
+            color: #d7e6ff;
+            font-size: 0.88rem;
+            margin-bottom: 10px;
+        }
+
+        .single-video-empty {
+            min-height: 180px;
+            border: 1px dashed var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 18px;
+            color: var(--muted);
+            background: rgba(7, 11, 18, 0.45);
+        }
+
+        .single-video-link {
+            color: #92c9ff;
+            text-decoration: none;
+            font-size: 0.88rem;
+        }
+
+        .workflow-shell {
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            border-right: 1px solid var(--border);
+            background: linear-gradient(180deg, #171f2d 0%, #101723 100%);
+            padding: var(--space);
+        }
+
+        .content {
+            padding: 28px;
+            overflow-y: auto;
+        }
+
+        .preview {
+            border-left: 1px solid var(--border);
+            background: #101722;
+            padding: var(--space);
+            overflow-y: auto;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            color: var(--accent);
+            letter-spacing: 0.4px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+
+        .step-item {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #111a26;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .step-item.active {
+            border-color: var(--accent);
+            background: #2a2532;
+            color: #ffe9ad;
+        }
+
+        .step-item.done {
+            border-color: var(--accent-2);
+        }
+
+        .panel {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+            margin-bottom: 14px;
+        }
+
+        .panel h2 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #f7f9ff;
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #0f1725;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: Consolas, monospace;
+            font-size: 0.85rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #291f07;
+        }
+
+        .btn-secondary {
+            background: #2b3a52;
+            color: var(--text);
+        }
+
+        .btn-accent {
+            background: var(--accent-2);
+            color: #0c1f1d;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .status {
+            margin-top: 10px;
+            color: var(--accent-2);
+            font-size: 0.88rem;
+            min-height: 22px;
+        }
+
+        pre {
+            background: #0a101a;
+            border: 1px solid #243047;
+            border-radius: 8px;
+            padding: 10px;
+            color: #b8c9e8;
+            font-size: 0.78rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .scene-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            background: #111a28;
+        }
+        .scene-builder-card.focus-target {
+            border-color: var(--accent-2);
+            box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.35);
+        }
+
+        .project-tab-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-tab-active {
+            outline: 2px solid var(--accent-2);
+            background: #21354d;
+        }
+
+        .scene-builder-card {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #101a28;
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .scene-builder-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .scene-builder-code {
+            max-height: 320px;
+            overflow: auto;
+        }
+
+        .scene-image-strip {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+        }
+
+        .scene-image-thumb {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #0a111d;
+            flex: 0 0 auto;
+        }
+
+        .clips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .clip-player {
+            width: 100%;
+            max-height: 300px;
+            background: #090d14;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .clip-player-shell {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .clip-placeholder {
+            height: 170px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: linear-gradient(180deg, #1c2434 0%, #0d1320 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        .clip-overlay {
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            background: rgba(6, 10, 18, 0.62);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .clip-spinner {
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            border: 3px solid rgba(255, 255, 255, 0.25);
+            border-top-color: var(--accent-2);
+            animation: spin 0.9s linear infinite;
+        }
+
+        .clip-progress {
+            font-size: 0.84rem;
+            color: #d7f6f1;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .scene-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        .artifact-list a {
+            color: #92c9ff;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.85rem;
+        }
+
+        .quickstart-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(7, 10, 16, 0.78);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            backdrop-filter: blur(6px);
+        }
+
+        .quickstart-card {
+            width: min(760px, 94vw);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: linear-gradient(180deg, #1a2232 0%, #121a26 100%);
+            padding: 22px;
+            box-shadow: 0 20px 44px rgba(0, 0, 0, 0.45);
+        }
+
+        .quickstart-card h2 {
+            color: #fff3cc;
+            margin-bottom: 10px;
+        }
+
+        .quickstart-card textarea {
+            min-height: 180px;
+            font-size: 0.95rem;
+        }
+
+        .quickstart-card .quickstart-scene-count {
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 1200px) {
+            .workflow-layout {
+                grid-template-columns: 1fr;
+            }
+            .sidebar, .preview {
+                display: none;
+            }
+            .home-hero {
+                grid-template-columns: 1fr;
+            }
+            .home-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .home-single-video {
+                grid-template-columns: 1fr;
+            }
+
+            .scene-builder-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="home-page" class="home-page">
+        <header class="home-nav">
+            <div class="home-brand">Magic Media Studio</div>
+            <div class="actions">
+                <button class="btn btn-primary" id="btn-home-start-top">Start Workflow</button>
+            </div>
+        </header>
+
+        <section class="home-hero">
+            <div>
+                <p class="home-eyebrow">AI VIDEO BUILDER</p>
+                <h1 class="home-title">Create polished videos from one simple description.</h1>
+                <p class="home-copy">
+                    Start with a short prompt. The system builds your manifest, generates cast, scenes, dialogue, voice mapping, and render outputs.
+                    You can then edit characters and approve before final render.
+                </p>
+                <div class="actions">
+                    <button class="btn btn-primary" id="btn-home-start-primary">Start Workflow</button>
+                    <button class="btn btn-secondary" id="btn-home-scroll-details">See Features</button>
+                </div>
+            </div>
+            <div class="home-card">
+                <h3>How It Works</h3>
+                <p>1. Describe your video idea.</p>
+                <p>2. Review generated characters and upload reference images.</p>
+                <p>3. Render with consistent voice + scene continuity.</p>
+            </div>
+        </section>
+
+        <section class="home-single-video">
+            <article class="home-card single-video-form">
+                <h3>Single Video</h3>
+                <p>
+                    Generate one quick clip from a prompt without creating a project. You can optionally add one reference image.
+                </p>
+                <label for="single-video-prompt" style="margin-top: 14px;">Prompt</label>
+                <textarea id="single-video-prompt" placeholder="Example: A cinematic close-up of a traveler stepping onto a balcony at sunrise, smiling with relief as the city wakes up below."></textarea>
+                <label for="single-video-image">Optional Image Reference</label>
+                <input id="single-video-image" type="file" accept="image/png,image/jpeg,image/webp">
+                <div class="actions">
+                    <button class="btn btn-accent" id="btn-single-video-generate">Generate Single Video</button>
+                </div>
+                <div class="status" id="single-video-status"></div>
+            </article>
+            <article class="home-card single-video-result">
+                <h3>Latest Clip</h3>
+                <p class="single-video-meta" id="single-video-meta">Uses the configured video API directly. No workflow state is created.</p>
+                <div id="single-video-empty" class="single-video-empty">
+                    Your generated clip will appear here.
+                </div>
+                <video id="single-video-player" class="clip-player hidden" controls playsinline></video>
+                <a id="single-video-link" class="single-video-link hidden" target="_blank" rel="noopener noreferrer"></a>
+            </article>
+        </section>
+
+        <section id="home-details" class="home-grid">
+            <article class="home-card">
+                <h3>Description-First</h3>
+                <p>No long forms to start. One prompt fills required brief fields and generates a full first draft.</p>
+            </article>
+            <article class="home-card">
+                <h3>Character Consistency</h3>
+                <p>Assign names, voices, and image references per character so scenes stay coherent across segments.</p>
+            </article>
+            <article class="home-card">
+                <h3>Production Controls</h3>
+                <p>Approve scripts, control scenes, estimate cost/time, pause/resume jobs, export bundles.</p>
+            </article>
+        </section>
+
+        <section class="home-cta">
+            <h3 style="margin-bottom: 8px;">Ready to Generate?</h3>
+            <p class="home-copy">Launch the workflow and start with your video description.</p>
+            <div class="actions">
+                <button class="btn btn-primary" id="btn-home-start-secondary">Open Builder</button>
+            </div>
+        </section>
+    </div>
+
+        <div id="workflow-shell" class="workflow-shell hidden">
+        <div id="quickstart-overlay" class="quickstart-overlay hidden">
+            <div class="quickstart-card">
+                <h2>Describe Your Video</h2>
+                <p class="hint">Start with one natural-language description. The system will infer the brief, generate a first manifest, then take you straight to characters.</p>
+                <textarea id="quickstart-description" placeholder="Example: Create a funny TikTok ad for a productivity app for university students, 15 seconds, energetic tone, end with a clear sign-up CTA."></textarea>
+                <div class="quickstart-scene-count">
+                    <label>Number of Scenes</label>
+                    <input id="quickstart-scene-count" type="number" min="1" max="20" placeholder="6">
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" id="btn-quickstart-create">Create Project</button>
+                    <button class="btn btn-secondary" id="btn-quickstart-manual">Open Manual Form</button>
+                </div>
+                <div class="status" id="quickstart-status"></div>
+            </div>
+        </div>
+
+        <div id="workflow-layout-root" class="workflow-layout">
+            <aside class="sidebar">
+                <h1>Video Builder V2</h1>
+                <p class="subtitle">Description-first workflow. Keep it simple, open advanced only when needed.</p>
+                <div class="actions">
+                    <button class="btn btn-secondary" id="btn-back-home">Home</button>
+                    <button class="btn btn-secondary" id="btn-open-quickstart">New From Description</button>
+                    <button class="btn btn-secondary" id="btn-toggle-advanced-flow">Enable Advanced Filling</button>
+                </div>
+                <div id="step-list"></div>
+                <div class="panel">
+                    <h2>Project</h2>
+                    <div id="project-meta" class="hint">No project yet.</div>
+                    <div class="project-tab-row">
+                        <button class="btn btn-secondary" id="btn-open-workflow-tab">Workflow</button>
+                        <button class="btn btn-secondary" id="btn-open-scene-builder-tab">Scene Builder</button>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="content">
+                <div class="panel">
+                    <h2 id="step-title">Step</h2>
+                    <p id="step-hint" class="hint"></p>
+                    <div id="step-form"></div>
+                    <div class="actions">
+                        <button class="btn btn-secondary" id="btn-back">Back</button>
+                        <button class="btn btn-secondary" id="btn-save">Save</button>
+                        <button class="btn btn-accent" id="btn-skip">Skip</button>
+                        <button class="btn btn-accent" id="btn-surprise">Surprise Me</button>
+                        <button class="btn btn-primary" id="btn-next">Next</button>
+                    </div>
+                    <div class="status" id="status"></div>
+                </div>
+
+                <div class="panel" id="scene-lock-panel" style="display:none;">
+                    <h2>Scene Locks</h2>
+                    <div id="scene-locks"></div>
+                </div>
+
+                <div class="panel" id="render-panel" style="display:none;">
+                    <h2>Generate Output</h2>
+                    <p class="hint">Generate scene clips and final video. You can reorder scenes before full render.</p>
+                    <div class="actions">
+                        <button class="btn btn-primary" id="btn-render">Start Render</button>
+                        <button class="btn btn-secondary" id="btn-pause-job">Pause</button>
+                        <button class="btn btn-secondary" id="btn-resume-job">Resume</button>
+                        <button class="btn btn-danger" id="btn-cancel-job">Cancel</button>
+                        <button class="btn btn-secondary" id="btn-refresh-artifacts">Refresh Artifacts</button>
+                        <button class="btn btn-secondary" id="btn-estimate">Estimate Cost/Time</button>
+                        <button class="btn btn-secondary" id="btn-snapshot">Snapshot</button>
+                        <button class="btn btn-secondary" id="btn-refresh-snapshots">Snapshots</button>
+                        <button class="btn btn-accent" id="btn-export">Export Bundle</button>
+                    </div>
+                <div id="job-status" class="status"></div>
+                <pre id="job-warning-log" class="hint" style="white-space: pre-wrap; margin-top: 6px;"></pre>
+                <pre id="estimate-output">{}</pre>
+                    <div class="hint">Latest Final Preview</div>
+                    <video id="preview-player" controls style="width:100%;max-height:360px;background:#090d14;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;"></video>
+                    <div class="artifact-list" id="artifact-list"></div>
+                    <div class="artifact-list" id="snapshot-list"></div>
+                </div>
+
+                <div class="panel" id="advanced-panel" style="display:none;">
+                    <h2>Advanced Controls</h2>
+                    <label>Timeline JSON</label>
+                    <textarea id="timeline-json"></textarea>
+                    <div class="actions">
+                        <button class="btn btn-secondary" id="btn-save-timeline">Save Timeline</button>
+                    </div>
+                    <label>Character Bible JSON</label>
+                    <textarea id="bible-json"></textarea>
+                    <div class="actions">
+                        <button class="btn btn-secondary" id="btn-save-bible">Save Character Bible</button>
+                    </div>
+                </div>
+            </main>
+
+            <aside id="preview-panel" class="preview">
+                <h1>Manifest Preview</h1>
+                <pre id="manifest-preview">{}</pre>
+                <div class="panel">
+                    <h2>Completion</h2>
+                    <pre id="completion-preview">{}</pre>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const ALL_STEPS = [
+            { key: "brief", title: "Description", hint: "Describe the video once. Backend fills the manifest automatically." },
+            { key: "characters", title: "Characters", hint: "Add characters if you have any, or skip this step." },
+            { key: "world", title: "World & Style", hint: "Advanced filling: optional world/style overrides." },
+            { key: "scenes", title: "Scene Plan", hint: "Advanced filling: adjust scene structure and scene types." },
+            { key: "script", title: "Script & Dialogue", hint: "Advanced filling: edit script/dialogue manually." },
+            { key: "audio", title: "Audio", hint: "Advanced filling: set music and SFX preferences." },
+            { key: "output", title: "Output Specs", hint: "Advanced filling: output format controls." },
+            { key: "review", title: "Generate", hint: "Generate clips, preview outputs, and arrange scene order for full video." }
+        ];
+        const SIMPLE_STEP_KEYS = ["brief", "characters", "review"];
+
+        const requiredBriefFields = [
+            "video_type",
+            "goal",
+            "target_audience",
+            "platform",
+            "duration_seconds",
+            "aspect_ratio",
+            "tone",
+            "language",
+            "accent"
+        ];
+        const SCENE_TYPE_OPTIONS = [
+            { value: "auto", label: "Auto" },
+            { value: "hook", label: "Hook" },
+            { value: "problem", label: "Problem" },
+            { value: "reframe", label: "Reframe" },
+            { value: "solution", label: "Solution" },
+            { value: "payoff", label: "Payoff" },
+            { value: "cta", label: "CTA" },
+            { value: "b_roll", label: "B-roll" },
+            { value: "testimonial", label: "Testimonial" },
+            { value: "tutorial", label: "Tutorial" },
+            { value: "transition", label: "Transition" },
+            { value: "custom", label: "Custom" }
+        ];
+
+        let projectId = null;
+        let seed = null;
+        let manifest = {};
+        let completion = {};
+        let currentStep = 0;
+        let lastJobId = null;
+        let lastJobSnapshot = null;
+        let activePollTimer = null;
+        let pollInFlight = false;
+        let advancedFlowEnabled = false;
+        let artifactsCache = [];
+        let sceneArrangeDraft = [];
+        let sidebarTab = "workflow";
+        let sceneBuilderFocusSceneId = "";
+
+        function getVisibleSteps() {
+            if (advancedFlowEnabled) return ALL_STEPS;
+            return ALL_STEPS.filter(step => SIMPLE_STEP_KEYS.includes(step.key));
+        }
+
+        function currentStepDef() {
+            const visible = getVisibleSteps();
+            return visible[Math.max(0, Math.min(currentStep, visible.length - 1))];
+        }
+
+        function $(id) { return document.getElementById(id); }
+
+        function setStatus(text, isError = false) {
+            const el = $("status");
+            el.textContent = text || "";
+            el.style.color = isError ? "var(--danger)" : "var(--accent-2)";
+        }
+
+        function setQuickstartStatus(text, isError = false) {
+            const el = $("quickstart-status");
+            if (!el) return;
+            el.textContent = text || "";
+            el.style.color = isError ? "var(--danger)" : "var(--accent-2)";
+        }
+
+        function setSingleVideoStatus(text, isError = false) {
+            const el = $("single-video-status");
+            if (!el) return;
+            el.textContent = text || "";
+            el.style.color = isError ? "var(--danger)" : "var(--accent-2)";
+        }
+
+        function renderSingleVideoResult(payload) {
+            const player = $("single-video-player");
+            const empty = $("single-video-empty");
+            const link = $("single-video-link");
+            const meta = $("single-video-meta");
+            if (player && payload.videoUrl) {
+                player.src = payload.videoUrl;
+                player.classList.remove("hidden");
+                player.load();
+            }
+            if (empty) {
+                empty.classList.add("hidden");
+            }
+            if (link && payload.videoUrl) {
+                link.href = payload.videoUrl;
+                link.textContent = `Open ${payload.filename || "generated video"}`;
+                link.classList.remove("hidden");
+            }
+            if (meta) {
+                const parts = [payload.provider || "api", payload.model || ""].filter(Boolean);
+                if (payload.hasReferenceImage) {
+                    parts.push("with image reference");
+                }
+                if (payload.aspectRatio) {
+                    parts.push(payload.aspectRatio);
+                }
+                meta.textContent = parts.join(" / ");
+            }
+        }
+
+        async function readApiResponse(response) {
+            const contentType = (response.headers.get("content-type") || "").toLowerCase();
+            if (contentType.includes("application/json")) {
+                const payload = await response.json();
+                if (!response.ok) {
+                    throw new Error(
+                        payload.error ||
+                        `Request failed (${response.status}).`
+                    );
+                }
+                return payload;
+            }
+            const raw = (await response.text() || "").trim();
+            const compact = raw.replace(/\s+/g, " ").slice(0, 240);
+            throw new Error(
+                `Unexpected server response (${response.status}). ${compact || "No details."}`
+            );
+        }
+
+        async function requestJsonWithPatchFallback(url, payload) {
+            const baseUrl = String(url || "").replace(/\/+$/, "");
+            const attempts = [
+                { method: "PATCH", url: baseUrl },
+                { method: "POST", url: baseUrl },
+                { method: "PATCH", url: `${baseUrl}/` },
+                { method: "POST", url: `${baseUrl}/` }
+            ];
+            let lastResponse = null;
+            for (let i = 0; i < attempts.length; i += 1) {
+                const attempt = attempts[i];
+                const response = await fetch(attempt.url, {
+                    method: attempt.method,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload || {})
+                });
+                lastResponse = response;
+                const shouldRetry = (response.status === 404 || response.status === 405) && i < attempts.length - 1;
+                if (shouldRetry) continue;
+                return readApiResponse(response);
+            }
+            return readApiResponse(lastResponse);
+        }
+
+        function buildImageUploadFormData(files) {
+            const formData = new FormData();
+            (files || []).forEach(file => formData.append("images", file));
+            return formData;
+        }
+
+        async function uploadImagesWithFallback(url, files) {
+            const baseUrl = String(url || "").replace(/\/+$/, "");
+            const attempts = [
+                { method: "POST", url: baseUrl },
+                { method: "PATCH", url: baseUrl },
+                { method: "POST", url: `${baseUrl}/` },
+                { method: "PATCH", url: `${baseUrl}/` }
+            ];
+            let lastResponse = null;
+            for (let i = 0; i < attempts.length; i += 1) {
+                const attempt = attempts[i];
+                const response = await fetch(attempt.url, {
+                    method: attempt.method,
+                    body: buildImageUploadFormData(files)
+                });
+                lastResponse = response;
+                const shouldRetry = (response.status === 404 || response.status === 405) && i < attempts.length - 1;
+                if (shouldRetry) continue;
+                return readApiResponse(response);
+            }
+            return readApiResponse(lastResponse);
+        }
+
+        function setQuickstartVisible(show) {
+            const overlay = $("quickstart-overlay");
+            if (!overlay) return;
+            overlay.classList.toggle("hidden", !show);
+        }
+
+        function enterWorkflow(showQuickstart = true) {
+            const home = $("home-page");
+            const workflow = $("workflow-shell");
+            if (home) home.classList.add("hidden");
+            if (workflow) workflow.classList.remove("hidden");
+            if (showQuickstart && !projectId) {
+                setQuickstartVisible(true);
+            } else {
+                setQuickstartVisible(false);
+            }
+            renderPreview();
+            renderCurrentStep();
+            populateAdvancedEditors();
+        }
+
+        function goHome() {
+            const home = $("home-page");
+            const workflow = $("workflow-shell");
+            if (home) home.classList.remove("hidden");
+            if (workflow) workflow.classList.add("hidden");
+            setQuickstartVisible(false);
+            sidebarTab = "workflow";
+        }
+
+        function renderStepList() {
+            const list = $("step-list");
+            list.innerHTML = "";
+            const visible = getVisibleSteps();
+            if (currentStep >= visible.length) currentStep = visible.length - 1;
+            visible.forEach((step, idx) => {
+                const item = document.createElement("div");
+                item.className = "step-item";
+                if (idx === currentStep) item.classList.add("active");
+                if (completion.ready_for_render && idx < visible.length - 1) item.classList.add("done");
+                item.textContent = `${idx + 1}. ${step.title}`;
+                item.onclick = () => {
+                    sidebarTab = "workflow";
+                    currentStep = idx;
+                    renderCurrentStep();
+                };
+                list.appendChild(item);
+            });
+            const flowBtn = $("btn-toggle-advanced-flow");
+            if (flowBtn) {
+                flowBtn.textContent = advancedFlowEnabled
+                    ? "Disable Advanced Filling"
+                    : "Enable Advanced Filling";
+            }
+        }
+
+        function renderMeta() {
+            $("project-meta").innerHTML = projectId
+                ? `Project: <strong>${projectId}</strong><br>Seed: <strong>${seed || "-"}</strong>`
+                : "No project yet.";
+            const workflowBtn = $("btn-open-workflow-tab");
+            const sceneBuilderBtn = $("btn-open-scene-builder-tab");
+            if (workflowBtn) {
+                workflowBtn.classList.toggle("btn-tab-active", sidebarTab === "workflow");
+            }
+            if (sceneBuilderBtn) {
+                sceneBuilderBtn.classList.toggle("btn-tab-active", sidebarTab === "scene_builder");
+                sceneBuilderBtn.disabled = !projectId;
+            }
+        }
+
+        function renderPreview() {
+            $("manifest-preview").textContent = JSON.stringify(manifest || {}, null, 2);
+            $("completion-preview").textContent = JSON.stringify(completion || {}, null, 2);
+            renderMeta();
+            renderStepList();
+        }
+
+        function syncSceneArrangeDraft(force = false) {
+            const scenes = Array.isArray(manifest.scenes) ? manifest.scenes : [];
+            const sourceIds = scenes.map(scene => scene.scene_id).filter(Boolean);
+            const draftIds = sceneArrangeDraft.map(scene => scene.scene_id).filter(Boolean);
+            const sameSet = (
+                sourceIds.length === draftIds.length &&
+                sourceIds.every(id => draftIds.includes(id))
+            );
+            if (force || !sameSet) {
+                sceneArrangeDraft = scenes.map(scene => ({ ...scene }));
+            }
+        }
+
+        function hasSceneArrangementChanges() {
+            const current = (manifest.scenes || []).map(scene => scene.scene_id).filter(Boolean);
+            const draft = sceneArrangeDraft.map(scene => scene.scene_id).filter(Boolean);
+            if (current.length !== draft.length) return true;
+            return current.some((id, index) => id !== draft[index]);
+        }
+
+        function moveSceneDraft(index, direction) {
+            const target = index + direction;
+            if (index < 0 || target < 0 || target >= sceneArrangeDraft.length) return;
+            const draft = [...sceneArrangeDraft];
+            const [item] = draft.splice(index, 1);
+            draft.splice(target, 0, item);
+            sceneArrangeDraft = draft;
+            renderCurrentStep();
+        }
+
+        function sceneClipArtifact(sceneId) {
+            return artifactsCache.find(item => (
+                item.type === "video" &&
+                item.path.includes(`_${sceneId}_`) &&
+                !item.path.endsWith("_final.mp4")
+            ));
+        }
+
+        function finalVideoArtifact() {
+            return artifactsCache.find(item => (
+                item.type === "video" &&
+                item.path.endsWith("_final.mp4")
+            ));
+        }
+
+        function artifactByType(type) {
+            return artifactsCache.find(item => item.type === type);
+        }
+
+        function isApprovedSceneState(scene) {
+            const state = String(scene && scene.state ? scene.state : "").toLowerCase();
+            return state === "approved" || state === "locked" || state === "stitched";
+        }
+
+        function buildGeneratedClipsMarkup() {
+            syncSceneArrangeDraft(false);
+            if (!sceneArrangeDraft.length) {
+                return "<p class='hint'>No scenes yet. Render will create clips after scene generation.</p>";
+            }
+            const generatingSceneId = (
+                lastJobSnapshot &&
+                lastJobSnapshot.current_stage === "scene_generation" &&
+                lastJobSnapshot.current_scene_id
+            ) ? String(lastJobSnapshot.current_scene_id) : "";
+            const generatingScenePercent = Math.max(
+                0,
+                Math.min(
+                    100,
+                    Math.round((Number(lastJobSnapshot && lastJobSnapshot.current_scene_progress || 0) || 0) * 100)
+                )
+            );
+            const waitingSceneId = (
+                lastJobSnapshot &&
+                lastJobSnapshot.current_stage === "awaiting_scene_approval"
+            ) ? String(lastJobSnapshot.current_scene_id || "") : "";
+            const rows = sceneArrangeDraft.map((scene, idx) => {
+                const clip = sceneClipArtifact(scene.scene_id);
+                const link = clip
+                    ? `<a href="${clip.url}" target="_blank">Open clip</a>`
+                    : "<span class='hint'>pending clip</span>";
+                const isActiveGeneration = (
+                    generatingSceneId &&
+                    generatingSceneId === scene.scene_id &&
+                    (lastJobSnapshot.status === "running" || lastJobSnapshot.status === "queued")
+                );
+                const playerMedia = clip
+                    ? `<video class="clip-player" controls playsinline preload="metadata" src="${clip.url}"></video>`
+                    : `<div class="clip-placeholder">Clip pending for this scene.</div>`;
+                const loaderOverlay = isActiveGeneration
+                    ? `<div class="clip-overlay"><div class="clip-spinner"></div><div class="clip-progress">Generating ${generatingScenePercent}%</div></div>`
+                    : "";
+                const player = `<div class="clip-player-shell">${playerMedia}${loaderOverlay}</div>`;
+                const approved = isApprovedSceneState(scene);
+                const approvalLabel = approved ? "Unapprove" : "Approve";
+                const approvalValue = approved ? "false" : "true";
+                const stateLabel = String(scene.state || (scene.locked ? "locked" : "planned"));
+                const waitingBadge = waitingSceneId && waitingSceneId === scene.scene_id
+                    ? `<span style="color: var(--accent-2); font-weight: 700;">awaiting approval</span>`
+                    : `<span>${escapeHtml(stateLabel)}</span>`;
+                return `
+                    <div class="scene-card">
+                        <div class="scene-head">
+                            <strong>${scene.scene_id || `scene_${idx + 1}`}</strong>
+                            ${waitingBadge}
+                        </div>
+                        ${player}
+                        <div class="hint">${escapeHtml(scene.scene_prompt || scene.scene_goal || "")}</div>
+                        <div class="hint">Type: ${escapeHtml(scene.scene_type || "auto")}</div>
+                        <div class="actions">
+                            <button class="btn btn-secondary" data-move-scene="${idx}" data-direction="-1">Up</button>
+                            <button class="btn btn-secondary" data-move-scene="${idx}" data-direction="1">Down</button>
+                            <button class="btn btn-secondary" data-inline-scene-approve="${scene.scene_id}" data-approved="${approvalValue}">${approvalLabel}</button>
+                            <button class="btn btn-secondary" data-open-scene-builder="${scene.scene_id}">Edit Scene</button>
+                            ${link}
+                        </div>
+                    </div>
+                `;
+            }).join("");
+            const finalClip = finalVideoArtifact();
+            const finalRow = finalClip
+                ? `<div class="scene-card"><div class="scene-head"><strong>Final Video</strong><span>stitched</span></div><video class="clip-player" controls playsinline preload="metadata" src="${finalClip.url}"></video><a href="${finalClip.url}" target="_blank">${finalClip.path}</a></div>`
+                : "<div class='hint'>Final video not generated yet.</div>";
+            return `<div class="clips-grid">${rows}</div><div style='margin-top:8px;'>${finalRow}</div>`;
+        }
+
+        function bindGeneratedClipsActions(container) {
+            if (!container) return;
+            container.querySelectorAll("button[data-move-scene]").forEach(btn => {
+                btn.onclick = () => {
+                    const index = Number(btn.dataset.moveScene || "-1");
+                    const direction = Number(btn.dataset.direction || "0");
+                    moveSceneDraft(index, direction);
+                };
+            });
+            container.querySelectorAll("button[data-inline-scene-approve]").forEach(btn => {
+                btn.onclick = () => {
+                    approveScene(
+                        btn.dataset.inlineSceneApprove,
+                        btn.dataset.approved === "true"
+                    );
+                };
+            });
+            container.querySelectorAll("button[data-open-scene-builder]").forEach(btn => {
+                btn.onclick = () => openSceneBuilderEditor(btn.dataset.openSceneBuilder);
+            });
+        }
+
+        function renderGeneratedClipsInline() {
+            const container = $("generated-clips-inline");
+            if (!container) return;
+            container.innerHTML = buildGeneratedClipsMarkup();
+            bindGeneratedClipsActions(container);
+        }
+
+        function normalizeProjectPath(path) {
+            return String(path || "").replace(/\\/g, "/").replace(/^\/+/, "");
+        }
+
+        function projectFileUrl(path) {
+            const normalized = normalizeProjectPath(path);
+            if (!projectId || !normalized) return "";
+            return `/api/v2/projects/${projectId}/files/${encodeURI(normalized)}`;
+        }
+
+        function collectSceneBuilderInputReferences(scene) {
+            const refs = [];
+            const seen = new Set();
+            const addRef = (path, role = "") => {
+                const normalized = normalizeProjectPath(path);
+                if (!normalized || seen.has(normalized)) return;
+                seen.add(normalized);
+                refs.push({
+                    path: normalized,
+                    url: projectFileUrl(normalized),
+                    role: String(role || "")
+                });
+            };
+            const debugSentRefs = (scene.render_debug && Array.isArray(scene.render_debug.reference_images_sent))
+                ? scene.render_debug.reference_images_sent
+                : [];
+            const debugLastFrame = normalizeProjectPath(
+                scene.render_debug ? scene.render_debug.last_frame_sent : ""
+            );
+            if (debugSentRefs.length || debugLastFrame) {
+                debugSentRefs.forEach(path => addRef(path, "sent_reference"));
+                if (debugLastFrame) addRef(debugLastFrame, "continuity_last_frame");
+                return refs;
+            }
+            const debugRefInputs = (scene.render_debug && Array.isArray(scene.render_debug.reference_inputs))
+                ? scene.render_debug.reference_inputs
+                : [];
+            if (debugRefInputs.length) {
+                debugRefInputs.forEach(item => addRef(item.path, item.role));
+                return refs;
+            }
+            const debugRefs = (scene.render_debug && Array.isArray(scene.render_debug.reference_images))
+                ? scene.render_debug.reference_images
+                : [];
+            if (debugRefs.length) {
+                debugRefs.forEach(path => addRef(path, "resolved"));
+                return refs;
+            }
+            (scene.reference_images || []).forEach(path => addRef(path, "scene"));
+            const bible = manifest.character_bible || {};
+            (scene.characters_in_scene || []).forEach(characterId => {
+                const entry = bible[characterId] || {};
+                const characterRefs = entry.reference_images || [];
+                characterRefs.forEach(path => addRef(path, "character"));
+            });
+            return refs;
+        }
+
+        function resolveSceneBuilderOutputClip(scene) {
+            const debugPath = normalizeProjectPath(
+                scene && scene.render_debug ? scene.render_debug.output_clip_path : ""
+            );
+            if (debugPath) {
+                return {
+                    path: debugPath,
+                    url: projectFileUrl(debugPath)
+                };
+            }
+            const artifact = sceneClipArtifact(scene.scene_id);
+            if (artifact && artifact.url) {
+                return {
+                    path: artifact.path,
+                    url: artifact.url
+                };
+            }
+            return null;
+        }
+
+        function sceneBuilderSnapshot(scene) {
+            const conversation = Array.isArray(scene.conversation) && scene.conversation.length
+                ? scene.conversation
+                : (scene.dialogue || []).map(line => `${line.speaker_id || "narrator"}: ${line.line || ""}`).filter(Boolean);
+            return {
+                scene_id: scene.scene_id,
+                scene_type: scene.scene_type,
+                scene_prompt: scene.scene_prompt || scene.scene_goal || "",
+                conversation,
+                location_time: scene.location_time,
+                characters_in_scene: scene.characters_in_scene || [],
+                dialogue: scene.dialogue || [],
+                continuity: scene.continuity || {},
+                builder: scene.builder || {}
+            };
+        }
+
+        function renderSceneBuilderInspector(form) {
+            if (!projectId) {
+                form.innerHTML = "<p class='hint'>Create a project first to inspect scene builder output.</p>";
+                return;
+            }
+            const scenes = Array.isArray(manifest.scenes) ? manifest.scenes : [];
+            if (!scenes.length) {
+                form.innerHTML = `
+                    <p class="hint">No scenes available yet. Generate scenes from Description or Scene Plan step first.</p>
+                    <div class="actions">
+                        <button class="btn btn-secondary" id="btn-scene-builder-back">Back to Workflow</button>
+                    </div>
+                `;
+                const backBtn = $("btn-scene-builder-back");
+                if (backBtn) {
+                    backBtn.onclick = () => {
+                        sidebarTab = "workflow";
+                        renderCurrentStep();
+                    };
+                }
+                return;
+            }
+
+            const cards = scenes.map((scene, index) => {
+                const sceneId = scene.scene_id || `scene_${String(index + 1).padStart(3, "0")}`;
+                const refs = collectSceneBuilderInputReferences(scene);
+                const refsMarkup = refs.length
+                    ? refs.map(ref => `
+                        <a href="${ref.url}" target="_blank" title="${escapeHtml(`${ref.role || "reference"}: ${ref.path}`)}">
+                            <img class="scene-image-thumb" src="${ref.url}" alt="${escapeHtml(sceneId)} reference">
+                        </a>
+                    `).join("")
+                    : "<div class='hint'>No reference images resolved for this scene yet.</div>";
+                const debug = scene.render_debug || {};
+                const veoPrompt = String(debug.veo_prompt || "").trim();
+                const output = resolveSceneBuilderOutputClip(scene);
+                const outputMarkup = output
+                    ? `
+                        <video class="clip-player" controls playsinline preload="metadata" src="${output.url}"></video>
+                        <a href="${output.url}" target="_blank">${escapeHtml(output.path)}</a>
+                    `
+                    : "<div class='clip-placeholder'>No output clip yet for this scene.</div>";
+                const generationStatus = String(debug.generation_status || "not_generated");
+                const generationError = String(debug.generation_error || "").trim();
+                const scenePrompt = String(scene.scene_prompt || scene.scene_goal || "").trim();
+                const conversationLines = Array.isArray(scene.conversation) && scene.conversation.length
+                    ? scene.conversation
+                    : (scene.dialogue || []).map(line => `${line.speaker_id || "narrator"}: ${line.line || ""}`);
+                const conversationText = conversationLines.join("\n");
+                return `
+                    <div class="scene-builder-card" data-scene-builder-card="${escapeHtml(sceneId)}">
+                        <div class="scene-head">
+                            <strong>${escapeHtml(sceneId)}</strong>
+                            <span>${escapeHtml(generationStatus)}</span>
+                        </div>
+                        <div class="hint"><strong>Continuity:</strong> ${escapeHtml((scene.continuity && scene.continuity.from_scene_id) || "start scene")}</div>
+                        <div class="scene-builder-grid">
+                            <div>
+                                <label>Scene Input Images</label>
+                                <div class="scene-image-strip">${refsMarkup}</div>
+                                <div class="hint">Resolved input images: ${refs.length}</div>
+                                ${generationError ? `<div class="hint" style="color: var(--danger);">Generation error: ${escapeHtml(generationError)}</div>` : ""}
+                            </div>
+                            <div>
+                                <label>Veo 3 Input Prompt</label>
+                                <pre class="scene-builder-code">${escapeHtml(veoPrompt || "Render this scene to capture the exact Veo prompt input.")}</pre>
+                                <label>Veo Output</label>
+                                ${outputMarkup}
+                            </div>
+                        </div>
+                        <div class="grid" style="margin-top: 10px;">
+                            <div>
+                                <label>Scene Type</label>
+                                <select data-scene-type="${escapeHtml(sceneId)}">
+                                    ${sceneTypeOptionsMarkup(scene.scene_type || "auto")}
+                                </select>
+                            </div>
+                            <div style="grid-column: 1 / 3;">
+                                <label>Scene Prompt</label>
+                                <textarea data-scene-prompt="${escapeHtml(sceneId)}" placeholder="One clear prompt for this scene.">${escapeHtml(scenePrompt)}</textarea>
+                            </div>
+                            <div style="grid-column: 1 / 3;">
+                                <label>Conversation (one line per line, e.g. char_1: line)</label>
+                                <textarea data-scene-conversation="${escapeHtml(sceneId)}" placeholder="char_1: first line&#10;char_2: response">${escapeHtml(conversationText)}</textarea>
+                            </div>
+                        </div>
+                        <div class="actions" style="margin-top: 8px;">
+                            <button class="btn btn-secondary" data-scene-save-fields="${escapeHtml(sceneId)}">Save Scene Fields</button>
+                            <button class="btn btn-primary" data-scene-regenerate-video="${escapeHtml(sceneId)}">Regenerate Video</button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            const planJson = artifactByType("scene_builder_plan");
+            const debugJson = artifactByType("scene_render_debug");
+            const narrativeTxt = artifactByType("scene_builder_narrative");
+            const reportsLinks = [
+                planJson ? `<a href="${planJson.url}" target="_blank">scene_builder_plan.json</a>` : "",
+                debugJson ? `<a href="${debugJson.url}" target="_blank">scene_render_debug.json</a>` : "",
+                narrativeTxt ? `<a href="${narrativeTxt.url}" target="_blank">scene_builder_narrative.txt</a>` : ""
+            ].filter(Boolean).join(" | ");
+
+            form.innerHTML = `
+                <p class="hint">Simple flow editor: each scene has a prompt and conversation. Scenes continue from previous scene.</p>
+                <p class="hint">${reportsLinks || "Render once to generate Scene Builder JSON/TXT report files."}</p>
+                <div class="actions">
+                    <button class="btn btn-secondary" id="btn-scene-builder-refresh">Refresh Scene Builder Data</button>
+                    <button class="btn btn-secondary" id="btn-scene-builder-back">Back to Workflow</button>
+                </div>
+                ${cards}
+            `;
+
+            const refreshBtn = $("btn-scene-builder-refresh");
+            if (refreshBtn) refreshBtn.onclick = () => refreshProjectStateForPolling();
+            const backBtn = $("btn-scene-builder-back");
+            if (backBtn) {
+                backBtn.onclick = () => {
+                    sidebarTab = "workflow";
+                    renderCurrentStep();
+                };
+            }
+            form.querySelectorAll("button[data-scene-save-fields]").forEach(btn => {
+                btn.onclick = () => saveSceneBuilderFields(btn.dataset.sceneSaveFields);
+            });
+            form.querySelectorAll("button[data-scene-regenerate-video]").forEach(btn => {
+                btn.onclick = () => regenerateSceneVideo(btn.dataset.sceneRegenerateVideo);
+            });
+            if (sceneBuilderFocusSceneId) {
+                const target = form.querySelector(
+                    `[data-scene-builder-card="${sceneBuilderFocusSceneId}"]`
+                );
+                if (target) {
+                    target.classList.add("focus-target");
+                    target.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+                sceneBuilderFocusSceneId = "";
+            }
+        }
+
+        function parseJSONSafe(text, fallback) {
+            if (!text || !text.trim()) return fallback;
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                throw new Error("Invalid JSON format.");
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function normalizeSceneType(value) {
+            const normalized = String(value || "auto").trim().toLowerCase().replace(/[\s-]+/g, "_");
+            const allowed = new Set(SCENE_TYPE_OPTIONS.map(opt => opt.value));
+            return allowed.has(normalized) ? normalized : "custom";
+        }
+
+        function sceneTypeOptionsMarkup(selectedValue) {
+            const selected = normalizeSceneType(selectedValue);
+            return SCENE_TYPE_OPTIONS.map(opt => (
+                `<option value="${opt.value}" ${opt.value === selected ? "selected" : ""}>${opt.label}</option>`
+            )).join("");
+        }
+
+        function characterIdFromName(name, index) {
+            const base = (name || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+            if (!base) return `char_${index + 1}`;
+            return base.startsWith("char_") ? base : `char_${base}`;
+        }
+
+        function ensureProjectForStep(stepKey, payload) {
+            if (projectId) return Promise.resolve();
+            if (stepKey !== "brief") throw new Error("Create project from Brief step first.");
+            return fetch("/api/v2/projects", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+                .then(r => r.json().then(data => ({ ok: r.ok, data })))
+                .then(({ ok, data }) => {
+                    if (!ok) throw new Error(data.error || "Failed to create project.");
+                    projectId = data.project_id;
+                    seed = data.seed;
+                    manifest = data.manifest_preview;
+                    completion = data.completion || {};
+                    sidebarTab = "workflow";
+                    enterWorkflow(false);
+                    renderPreview();
+                });
+        }
+
+        async function createProjectFromQuickstart() {
+            const description = ($("quickstart-description")?.value || "").trim();
+            const sceneCountRaw = ($("quickstart-scene-count")?.value || "").trim();
+            if (!description) {
+                setQuickstartStatus("Enter a description to start.", true);
+                return;
+            }
+            const sceneCount = sceneCountRaw ? Number(sceneCountRaw) : null;
+            if (sceneCount !== null && (!Number.isFinite(sceneCount) || sceneCount < 1)) {
+                setQuickstartStatus("Scene count must be at least 1.", true);
+                return;
+            }
+            setQuickstartStatus("Creating project...");
+            try {
+                const response = await fetch("/api/v2/projects", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        description,
+                        brief: {
+                            scene_count_hint: sceneCount
+                        }
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Failed to create project.");
+                projectId = data.project_id;
+                seed = data.seed;
+                manifest = data.manifest_preview || {};
+                completion = data.completion || {};
+                sidebarTab = "workflow";
+                enterWorkflow(false);
+                setQuickstartStatus("");
+                currentStep = 1;
+                renderCurrentStep();
+                renderPreview();
+            } catch (error) {
+                setQuickstartStatus(error.message || "Failed to create project.", true);
+            }
+        }
+
+        async function generateSingleVideo() {
+            const prompt = ($("single-video-prompt")?.value || "").trim();
+            const imageInput = $("single-video-image");
+            const button = $("btn-single-video-generate");
+            if (!prompt) {
+                setSingleVideoStatus("Enter a prompt first.", true);
+                return;
+            }
+
+            const originalLabel = button ? button.textContent : "";
+            if (button) {
+                button.disabled = true;
+                button.textContent = "Generating...";
+            }
+            setSingleVideoStatus("Submitting single video request...");
+
+            const formData = new FormData();
+            formData.append("prompt", prompt);
+            const imageFile = imageInput && imageInput.files ? imageInput.files[0] : null;
+            if (imageFile) {
+                formData.append("image", imageFile);
+            }
+
+            try {
+                const response = await fetch("/api/simple-video", {
+                    method: "POST",
+                    body: formData
+                });
+                const payload = await readApiResponse(response);
+                renderSingleVideoResult(payload);
+                setSingleVideoStatus("Single video generated.");
+            } catch (error) {
+                setSingleVideoStatus(error.message || "Single video generation failed.", true);
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = originalLabel || "Generate Single Video";
+                }
+            }
+        }
+
+        function getStepPayload(stepKey) {
+            if (stepKey === "brief") {
+                const durationRaw = ($("duration_seconds")?.value || "").trim();
+                const sceneCountRaw = ($("scene_count_hint")?.value || "").trim();
+                const brief = {
+                    description: ($("video_description")?.value || "").trim(),
+                    video_type: ($("video_type")?.value || "").trim(),
+                    goal: ($("goal")?.value || "").trim(),
+                    target_audience: ($("target_audience")?.value || "").trim(),
+                    platform: ($("platform")?.value || "").trim(),
+                    duration_seconds: durationRaw ? Number(durationRaw) : null,
+                    scene_count_hint: sceneCountRaw ? Number(sceneCountRaw) : null,
+                    aspect_ratio: ($("aspect_ratio")?.value || "").trim(),
+                    tone: ($("tone")?.value || "").trim(),
+                    language: ($("language")?.value || "").trim(),
+                    accent: ($("accent")?.value || "").trim(),
+                    brand_rules: ($("brand_rules")?.value || "").trim()
+                };
+                return {
+                    brief,
+                    description: brief.description,
+                    generate_full_manifest: !!brief.description
+                };
+            }
+            if (stepKey === "characters") {
+                return { characters: collectCharactersFromForm() };
+            }
+            if (stepKey === "world") {
+                return {
+                    world: {
+                        setting: $("setting").value.trim(),
+                        background_style: $("background_style").value.trim(),
+                        color_palette: $("color_palette").value.trim(),
+                        wardrobe_props: $("wardrobe_props").value.trim(),
+                        camera_style: $("camera_style").value.trim(),
+                        lighting: $("lighting").value.trim(),
+                        motion: $("motion").value.trim(),
+                        visual_references_text: $("visual_references").value.trim()
+                    }
+                };
+            }
+            if (stepKey === "scenes") {
+                const scenePlanText = ($("scenes_text")?.value || "").trim();
+                const sceneTypeDefault = normalizeSceneType($("scene_type_default")?.value || "auto");
+                const editorRows = Array.from(document.querySelectorAll(".scene-editor-card"));
+                if (!editorRows.length) {
+                    return {
+                        scene_plan_text: scenePlanText,
+                        scene_type_default: sceneTypeDefault
+                    };
+                }
+                const existingMap = new Map((manifest.scenes || []).map(scene => [scene.scene_id, scene]));
+                const scenes = editorRows.map((row, index) => {
+                    const sceneId = (row.dataset.sceneId || "").trim() || `scene_${String(index + 1).padStart(3, "0")}`;
+                    const base = existingMap.get(sceneId) || {};
+                    const goal = (row.querySelector(".scene-goal-input")?.value || "").trim();
+                    const sceneType = normalizeSceneType(row.querySelector(".scene-type-select")?.value || sceneTypeDefault);
+                    if (!goal) return null;
+                    return {
+                        ...base,
+                        scene_id: sceneId,
+                        scene_goal: goal,
+                        scene_type: sceneType
+                    };
+                }).filter(Boolean);
+                if (!scenes.length) {
+                    return {
+                        scene_plan_text: scenePlanText,
+                        scene_type_default: sceneTypeDefault
+                    };
+                }
+                return {
+                    scenes,
+                    scene_plan_text: scenePlanText,
+                    scene_type_default: sceneTypeDefault
+                };
+            }
+            if (stepKey === "script") {
+                return { script_text: $("script_text").value.trim() };
+            }
+            if (stepKey === "audio") {
+                return {
+                    audio: {
+                        music_mood: $("music_mood").value.trim(),
+                        sound_effects_text: $("sound_effects").value.trim()
+                    }
+                };
+            }
+            if (stepKey === "output") {
+                return {
+                    output: {
+                        resolution: $("resolution").value.trim(),
+                        fps: Number($("fps").value || 30),
+                        subtitles_enabled: $("subtitles_enabled").value === "true",
+                        subtitle_style: $("subtitle_style").value.trim(),
+                        safe_areas: $("safe_areas").value.trim(),
+                        file_format: "mp4"
+                    }
+                };
+            }
+            return {};
+        }
+
+        function applyResponse(data) {
+            if (data.manifest_preview) manifest = data.manifest_preview;
+            if (data.completion) completion = data.completion;
+            if (projectId) {
+                setQuickstartVisible(false);
+            }
+            syncSceneArrangeDraft(true);
+            renderPreview();
+            renderCurrentStep();
+            populateAdvancedEditors();
+        }
+
+        async function saveStep() {
+            const step = currentStepDef();
+            const stepKey = step.key;
+            const payload = getStepPayload(stepKey);
+            setStatus("Saving...");
+            try {
+                await ensureProjectForStep(stepKey, payload);
+                const data = await requestJsonWithPatchFallback(
+                    `/api/v2/projects/${projectId}/steps/${stepKey}`,
+                    payload
+                );
+                applyResponse(data);
+                setStatus("Saved.");
+                if (stepKey === "brief" && !advancedFlowEnabled) {
+                    const visible = getVisibleSteps();
+                    const charIdx = visible.findIndex(item => item.key === "characters");
+                    if (charIdx >= 0) {
+                        currentStep = charIdx;
+                        renderCurrentStep();
+                    }
+                }
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function skipStep() {
+            const step = currentStepDef();
+            const stepKey = step.key;
+            setStatus("Auto-filling skipped step...");
+            try {
+                if (!projectId && stepKey !== "brief") throw new Error("Create project from brief first.");
+                if (!projectId && stepKey === "brief") {
+                    await ensureProjectForStep("brief", { brief: {} });
+                }
+                const response = await fetch(`/api/v2/projects/${projectId}/steps/${stepKey}/skip`, {
+                    method: "POST"
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Skip failed.");
+                applyResponse(data);
+                setStatus("Step auto-filled.");
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function surpriseStep() {
+            const step = currentStepDef();
+            const stepKey = step.key;
+            setStatus("Generating surprise variant...");
+            try {
+                if (!projectId && stepKey !== "brief") throw new Error("Create project from brief first.");
+                if (!projectId && stepKey === "brief") {
+                    await ensureProjectForStep("brief", { brief: {} });
+                }
+                const response = await fetch(`/api/v2/projects/${projectId}/steps/${stepKey}/surprise`, {
+                    method: "POST"
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Surprise failed.");
+                applyResponse(data);
+                setStatus("Surprise variant applied.");
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        function renderCurrentStep() {
+            renderMeta();
+            if (sidebarTab === "scene_builder") {
+                $("step-title").textContent = "Scene Builder";
+                $("step-hint").textContent = "Inspect and edit Gemini-built scenes, Veo input prompts, scene input images, and output clips side by side.";
+                const form = $("step-form");
+                form.innerHTML = "";
+                renderSceneBuilderInspector(form);
+                renderPanels();
+                renderStepList();
+                if (projectId) {
+                    refreshArtifacts();
+                }
+                return;
+            }
+
+            const step = currentStepDef();
+            $("step-title").textContent = `${currentStep + 1}. ${step.title}`;
+            $("step-hint").textContent = step.hint;
+
+            const form = $("step-form");
+            form.innerHTML = "";
+            if (step.key === "brief") renderBriefForm(form);
+            else if (step.key === "characters") renderCharactersForm(form);
+            else if (step.key === "world") renderWorldForm(form);
+            else if (step.key === "scenes") renderScenesForm(form);
+            else if (step.key === "script") renderScriptForm(form);
+            else if (step.key === "audio") renderAudioForm(form);
+            else if (step.key === "output") renderOutputForm(form);
+            else renderGenerateForm(form);
+
+            renderSceneLocks();
+            renderPanels();
+            renderStepList();
+            if (step.key === "review" && projectId) {
+                refreshArtifacts();
+            }
+        }
+
+        function renderBriefForm(form) {
+            const brief = manifest.brief || {};
+            if (!advancedFlowEnabled) {
+                form.innerHTML = `
+                    <label>Video Description</label>
+                    <textarea id="video_description" placeholder="Describe the video you want in natural language.">${escapeHtml(brief.description || "")}</textarea>
+                    <label>Scene Count (Optional)</label>
+                    <input id="scene_count_hint" type="number" min="1" value="${brief.scene_count_hint || ""}" placeholder="6">
+                    <p class="hint">This is all you need. Backend fills the full manifest. Open Advanced Filling only if you want manual control.</p>
+                `;
+                return;
+            }
+            form.innerHTML = `
+                <label>Video Description</label>
+                <textarea id="video_description" placeholder="Describe the video you want. Example: A funny TikTok ad for a budgeting app for students, 15 seconds, upbeat tone, end with a strong sign-up CTA.">${escapeHtml(brief.description || "")}</textarea>
+                <p class="hint">Advanced filling is enabled. Override any auto-filled brief field below.</p>
+                <div id="brief-advanced-fields">
+                    <div class="grid">
+                        <div><label>Video Type</label><input id="video_type" value="${brief.video_type || ""}" placeholder="ad / story / social skit"></div>
+                        <div><label>Goal</label><input id="goal" value="${brief.goal || ""}" placeholder="what should viewer do/feel?"></div>
+                        <div><label>Target Audience</label><input id="target_audience" value="${brief.target_audience || ""}" placeholder="who it is for"></div>
+                        <div><label>Platform</label><input id="platform" value="${brief.platform || ""}" placeholder="TikTok / YouTube / Instagram"></div>
+                        <div><label>Duration Seconds</label><input id="duration_seconds" type="number" value="${brief.duration_seconds || ""}" placeholder="15"></div>
+                        <div><label>Scene Count</label><input id="scene_count_hint" type="number" min="1" value="${brief.scene_count_hint || ""}" placeholder="6"></div>
+                        <div><label>Aspect Ratio</label><input id="aspect_ratio" value="${brief.aspect_ratio || ""}" placeholder="9:16"></div>
+                        <div><label>Tone</label><input id="tone" value="${brief.tone || ""}" placeholder="funny / serious / luxury"></div>
+                        <div><label>Language</label><input id="language" value="${brief.language || ""}" placeholder="English"></div>
+                        <div><label>Accent</label><input id="accent" value="${brief.accent || ""}" placeholder="Neutral American"></div>
+                        <div style="grid-column:1/3"><label>Brand Rules</label><textarea id="brand_rules">${brief.brand_rules || ""}</textarea></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCharactersForm(form) {
+            const chars = (manifest.characters && manifest.characters.length)
+                ? manifest.characters
+                : [
+                    {
+                        character_id: "char_1",
+                        name: "",
+                        role: "protagonist",
+                        appearance: "",
+                        personality: "",
+                        constraints: "Avoid resemblance to real people.",
+                        voice: { voice_provider: "native", voice_id: "native_default", speaking_style: "clear, natural, medium pace" }
+                    }
+                ];
+            const cards = chars.map((char, index) => renderCharacterCard(char, index)).join("");
+            form.innerHTML = `
+                <p class="hint">Use plain language for each character. No JSON required. Add names and optional reference photos.</p>
+                <div id="character-cards">${cards}</div>
+                <div class="actions">
+                    <button class="btn btn-secondary" id="btn-add-character" type="button">Add Character</button>
+                </div>
+            `;
+            const addBtn = $("btn-add-character");
+            if (addBtn) addBtn.onclick = () => addCharacterCard();
+            bindCharacterCardActions();
+        }
+
+        function renderCharacterCard(character, index) {
+            const charId = character.character_id || characterIdFromName(character.name || "", index);
+            const voice = character.voice || {};
+            const bible = (manifest.character_bible || {})[charId] || {};
+            const refs = bible.reference_images || character.reference_images || [];
+            const references = refs.map(path => {
+                if (!projectId) return `<div class="hint">${escapeHtml(path)}</div>`;
+                return `<a href="/api/v2/projects/${projectId}/files/${encodeURI(path)}" target="_blank">${escapeHtml(path)}</a>`;
+            }).join("");
+            return `
+                <div class="scene-card character-card" data-character-index="${index}">
+                    <div class="grid">
+                        <div>
+                            <label>Name</label>
+                            <input class="char-name" value="${escapeHtml(character.name || "")}" placeholder="Ava">
+                        </div>
+                        <div>
+                            <label>Role</label>
+                            <input class="char-role" value="${escapeHtml(character.role || "")}" placeholder="protagonist / narrator">
+                        </div>
+                        <div>
+                            <label>Appearance</label>
+                            <input class="char-appearance" value="${escapeHtml(character.appearance || "")}" placeholder="Age range, clothing, key traits">
+                        </div>
+                        <div>
+                            <label>Personality</label>
+                            <input class="char-personality" value="${escapeHtml(character.personality || "")}" placeholder="confident, calm, witty">
+                        </div>
+                        <div style="grid-column:1/3">
+                            <label>Constraints</label>
+                            <input class="char-constraints" value="${escapeHtml(character.constraints || "Avoid resemblance to real people.")}">
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <div>
+                            <label>Voice Provider</label>
+                            <select class="char-voice-provider">
+                                <option value="native" ${(voice.voice_provider || "native") === "native" ? "selected" : ""}>native</option>
+                                <option value="elevenlabs" ${(voice.voice_provider || "") === "elevenlabs" ? "selected" : ""}>elevenlabs</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Voice ID</label>
+                            <input class="char-voice-id" value="${escapeHtml(voice.voice_id || "")}" placeholder="voice id">
+                        </div>
+                        <div style="grid-column:1/3">
+                            <label>Speaking Style</label>
+                            <input class="char-speaking-style" value="${escapeHtml(voice.speaking_style || "")}" placeholder="clear, medium pace, energetic">
+                        </div>
+                    </div>
+                    <input type="hidden" class="char-id" value="${escapeHtml(charId)}">
+                    <div class="hint">Reference Images</div>
+                    <div class="artifact-list">${references || "<span class='hint'>No reference images yet.</span>"}</div>
+                    <div class="actions">
+                        <input class="char-image-input" type="file" accept="image/*" multiple>
+                        <button class="btn btn-secondary" type="button" data-upload-character="${escapeHtml(charId)}">Upload Images</button>
+                        <button class="btn btn-danger" type="button" data-remove-character="1">Remove</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addCharacterCard() {
+            const container = $("character-cards");
+            if (!container) return;
+            const index = container.querySelectorAll(".character-card").length;
+            const html = renderCharacterCard(
+                {
+                    character_id: `char_${index + 1}`,
+                    name: "",
+                    role: "protagonist",
+                    appearance: "",
+                    personality: "",
+                    constraints: "Avoid resemblance to real people.",
+                    voice: { voice_provider: "native", voice_id: "", speaking_style: "clear, natural, medium pace" }
+                },
+                index
+            );
+            container.insertAdjacentHTML("beforeend", html);
+            bindCharacterCardActions();
+        }
+
+        function collectCharactersFromForm() {
+            const rows = document.querySelectorAll(".character-card");
+            const result = [];
+            rows.forEach((row, index) => {
+                const name = (row.querySelector(".char-name")?.value || "").trim();
+                const role = (row.querySelector(".char-role")?.value || "").trim();
+                const appearance = (row.querySelector(".char-appearance")?.value || "").trim();
+                const personality = (row.querySelector(".char-personality")?.value || "").trim();
+                const constraints = (row.querySelector(".char-constraints")?.value || "").trim();
+                if (!name && !role && !appearance && !personality) return;
+                const idInput = row.querySelector(".char-id");
+                const charId = (idInput?.value || "").trim() || characterIdFromName(name, index);
+                if (idInput) idInput.value = charId;
+                result.push({
+                    character_id: charId,
+                    name: name || `Character ${index + 1}`,
+                    role: role || "protagonist",
+                    appearance: appearance || "Age 20-40, neutral styling",
+                    personality: personality || "confident",
+                    constraints: constraints || "Avoid resemblance to real people.",
+                    voice: {
+                        voice_provider: (row.querySelector(".char-voice-provider")?.value || "native").trim(),
+                        voice_id: (row.querySelector(".char-voice-id")?.value || "").trim() || `native_${charId}`,
+                        speaking_style: (row.querySelector(".char-speaking-style")?.value || "clear, natural, medium pace").trim()
+                    }
+                });
+            });
+            return result;
+        }
+
+        function bindCharacterCardActions() {
+            document.querySelectorAll("button[data-remove-character]").forEach(btn => {
+                btn.onclick = () => {
+                    const card = btn.closest(".character-card");
+                    if (card) card.remove();
+                };
+            });
+            document.querySelectorAll("button[data-upload-character]").forEach(btn => {
+                btn.onclick = () => uploadCharacterImages(btn);
+            });
+        }
+
+        async function uploadCharacterImages(button) {
+            if (!projectId) {
+                setStatus("Create the project from Brief step before uploading images.", true);
+                return;
+            }
+            const card = button.closest(".character-card");
+            if (!card) return;
+            const files = card.querySelector(".char-image-input")?.files;
+            if (!files || !files.length) {
+                setStatus("Pick one or more character images first.", true);
+                return;
+            }
+            const selectedFiles = Array.from(files);
+            const chars = collectCharactersFromForm();
+            const charIdInput = card.querySelector(".char-id");
+            const name = (card.querySelector(".char-name")?.value || "").trim();
+            const index = Number(card.dataset.characterIndex || "0");
+            const charId = (charIdInput?.value || "").trim() || characterIdFromName(name, index);
+            if (charIdInput) charIdInput.value = charId;
+
+            try {
+                const saveData = await requestJsonWithPatchFallback(
+                    `/api/v2/projects/${projectId}/steps/characters`,
+                    { characters: chars }
+                );
+                applyResponse(saveData);
+
+                const data = await uploadImagesWithFallback(
+                    `/api/v2/projects/${projectId}/characters/${charId}/images`,
+                    selectedFiles
+                );
+                applyResponse(data);
+                setStatus(`Uploaded ${data.uploaded_images.length} image(s) for ${charId}.`);
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        function renderWorldForm(form) {
+            const world = manifest.world || {};
+            form.innerHTML = `
+                <div class="grid">
+                    <div style="grid-column:1/3"><label>Setting</label><input id="setting" value="${world.setting || ""}" placeholder="location + era/time"></div>
+                    <div><label>Background Style</label><input id="background_style" value="${world.background_style || ""}" placeholder="realistic / anime / cinematic"></div>
+                    <div><label>Color Palette</label><input id="color_palette" value="${world.color_palette || ""}"></div>
+                    <div><label>Wardrobe + Props</label><input id="wardrobe_props" value="${world.wardrobe_props || ""}"></div>
+                    <div><label>Camera Style</label><input id="camera_style" value="${world.camera_style || ""}"></div>
+                    <div><label>Lighting</label><input id="lighting" value="${world.lighting || ""}"></div>
+                    <div><label>Motion</label><input id="motion" value="${world.motion || ""}"></div>
+                    <div style="grid-column:1/3"><label>Visual References (one per line)</label><textarea id="visual_references">${(world.visual_references || []).join("\n")}</textarea></div>
+                </div>
+            `;
+        }
+
+        function renderScenesForm(form) {
+            const scenes = manifest.scenes || [];
+            const sceneLines = scenes.map(scene => scene.scene_goal || "").filter(Boolean).join("\n");
+            const defaultSceneType = normalizeSceneType((manifest.brief || {}).default_scene_type || "auto");
+            const cards = scenes.map((scene, index) => {
+                const sceneId = scene.scene_id || `scene_${String(index + 1).padStart(3, "0")}`;
+                return `
+                    <div class="scene-card scene-editor-card" data-scene-id="${escapeHtml(sceneId)}">
+                        <div class="grid">
+                            <div>
+                                <label>Scene ID</label>
+                                <input value="${escapeHtml(sceneId)}" disabled>
+                            </div>
+                            <div>
+                                <label>Scene Type</label>
+                                <select class="scene-type-select">
+                                    ${sceneTypeOptionsMarkup(scene.scene_type || "auto")}
+                                </select>
+                            </div>
+                            <div style="grid-column:1/3">
+                                <label>Scene Goal</label>
+                                <input class="scene-goal-input" value="${escapeHtml(scene.scene_goal || "")}" placeholder="What should happen in this scene?">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+            form.innerHTML = `
+                <label>Scene Plan (natural language)</label>
+                <textarea id="scenes_text" placeholder="One scene goal per line. Example: Hook with quick pain-point.&#10;Demonstrate the solution.&#10;Close with CTA.">${escapeHtml(sceneLines)}</textarea>
+                <div class="grid">
+                    <div>
+                        <label>Default Scene Type</label>
+                        <select id="scene_type_default">
+                            ${sceneTypeOptionsMarkup(defaultSceneType)}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Hint</label>
+                        <div class="hint">You can set a type per scene below, or leave on Auto.</div>
+                    </div>
+                </div>
+                ${cards ? `<div style="margin-top:12px;"><div class="hint">Edit Scene Types</div>${cards}</div>` : ""}
+            `;
+        }
+
+        function renderScriptForm(form) {
+            const lines = [];
+            (manifest.scenes || []).forEach(scene => {
+                if (!scene || !scene.scene_id) return;
+                lines.push(`${scene.scene_id}: ${scene.scene_goal || ""}`);
+                (scene.dialogue || []).forEach(line => {
+                    lines.push(`${line.speaker_id || "narrator"}: ${line.line || ""}`);
+                });
+                lines.push("");
+            });
+            form.innerHTML = `
+                <label>Script / Dialogue (natural language)</label>
+                <textarea id="script_text" placeholder="Use lines like 'scene_001: Hook scene goal' and 'char_ava: dialogue line'">${escapeHtml(lines.join("\n"))}</textarea>
+            `;
+        }
+
+        function renderAudioForm(form) {
+            const audio = manifest.audio || {};
+            form.innerHTML = `
+                <label>Music Mood</label>
+                <input id="music_mood" value="${audio.music_mood || ""}" placeholder="uplifting / suspense / calm">
+                <label>Sound Effects (comma or line separated)</label>
+                <textarea id="sound_effects">${(audio.sound_effects || []).join(", ")}</textarea>
+            `;
+        }
+
+        function renderOutputForm(form) {
+            const output = manifest.output || {};
+            form.innerHTML = `
+                <div class="grid">
+                    <div><label>Resolution</label><input id="resolution" value="${output.resolution || "1080p"}"></div>
+                    <div><label>FPS</label><input id="fps" type="number" value="${output.fps || 30}"></div>
+                    <div><label>Subtitles Enabled</label>
+                        <select id="subtitles_enabled">
+                            <option value="true" ${output.subtitles_enabled !== false ? "selected" : ""}>On</option>
+                            <option value="false" ${output.subtitles_enabled === false ? "selected" : ""}>Off</option>
+                        </select>
+                    </div>
+                    <div><label>Subtitle Style</label><input id="subtitle_style" value="${output.subtitle_style || ""}"></div>
+                    <div style="grid-column:1/3"><label>Safe Areas</label><input id="safe_areas" value="${output.safe_areas || ""}"></div>
+                </div>
+            `;
+        }
+
+        function renderGenerateForm(form) {
+            const missing = (completion.missing_required_brief_fields || []);
+            const approvals = manifest.approvals || {};
+            const mode = manifest.generation_mode || "auto";
+            syncSceneArrangeDraft(false);
+            form.innerHTML = `
+                <p class="hint">Generate clips and final output from the current manifest. Arrange scenes before full render.</p>
+                <p class="hint">Missing required brief fields: ${missing.length ? missing.join(", ") : "none"}</p>
+                <p class="hint">Script approval: <strong>${approvals.script_approved ? "Approved" : "Pending (auto-approved on render)"}</strong></p>
+                <label>Generation Mode</label>
+                <select id="generation_mode_select">
+                    <option value="auto" ${mode === "auto" ? "selected" : ""}>Auto Run</option>
+                    <option value="directed" ${mode === "directed" ? "selected" : ""}>Directed Run</option>
+                </select>
+                <div class="actions">
+                    <button class="btn btn-secondary" id="btn-save-mode">Save Mode</button>
+                    <button class="btn btn-secondary" id="btn-refresh-clips-inline">Refresh Generated Videos</button>
+                    <button class="btn btn-primary" id="btn-save-arrangement">Save Arrangement</button>
+                </div>
+                <div id="generated-clips-inline"></div>
+            `;
+            const modeBtn = $("btn-save-mode");
+            if (modeBtn) modeBtn.onclick = () => saveGenerationMode();
+            const refreshBtn = $("btn-refresh-clips-inline");
+            if (refreshBtn) refreshBtn.onclick = refreshArtifacts;
+            const saveArrangementBtn = $("btn-save-arrangement");
+            if (saveArrangementBtn) saveArrangementBtn.onclick = saveSceneArrangement;
+            renderGeneratedClipsInline();
+        }
+
+        function renderSubtitleEditor() {
+            const container = $("subtitle-editor");
+            if (!container) return;
+            const scenes = manifest.scenes || [];
+            if (!scenes.length) {
+                container.innerHTML = "<p class='hint'>No dialogue available yet.</p>";
+                return;
+            }
+            let html = "<h2 style='margin-top:12px;'>Subtitle Inline Editor</h2>";
+            scenes.forEach(scene => {
+                const dialogue = scene.dialogue || [];
+                if (!dialogue.length) return;
+                html += `<div class="scene-card"><div class="scene-head"><strong>${scene.scene_id}</strong><span>${scene.state || "planned"}</span></div>`;
+                dialogue.forEach((line, idx) => {
+                    html += `
+                        <label>${line.speaker_id || "speaker"} line ${idx + 1}</label>
+                        <input data-subtitle-scene="${scene.scene_id}" data-subtitle-index="${idx}" value="${(line.line || "").replace(/"/g, "&quot;")}">
+                        <div class="grid">
+                            <div><label>Start</label><input type="number" step="0.1" data-subtitle-start="${scene.scene_id}" data-subtitle-index="${idx}" value="${line.start_second || 0}"></div>
+                            <div><label>End</label><input type="number" step="0.1" data-subtitle-end="${scene.scene_id}" data-subtitle-index="${idx}" value="${line.end_second || 0}"></div>
+                        </div>
+                        <button class="btn btn-secondary" data-save-subtitle="${scene.scene_id}" data-subtitle-index="${idx}">Save Line</button>
+                    `;
+                });
+                html += "</div>";
+            });
+            container.innerHTML = html;
+            container.querySelectorAll("button[data-save-subtitle]").forEach(btn => {
+                btn.onclick = () => {
+                    const sceneId = btn.dataset.saveSubtitle;
+                    const index = Number(btn.dataset.subtitleIndex || "0");
+                    saveSubtitleLine(sceneId, index);
+                };
+            });
+        }
+
+        function renderPanels() {
+            const sceneBuilderActive = sidebarTab === "scene_builder";
+            const step = currentStepDef();
+            const isGenerateStep = !sceneBuilderActive && step.key === "review";
+            const sceneLockPanel = $("scene-lock-panel");
+            const renderPanel = $("render-panel");
+            const advancedPanel = $("advanced-panel");
+            const previewPanel = $("preview-panel");
+            const workflowLayout = $("workflow-layout-root");
+
+            if (sceneLockPanel) {
+                sceneLockPanel.style.display = (
+                    !sceneBuilderActive &&
+                    advancedFlowEnabled &&
+                    step.key === "scenes" &&
+                    projectId
+                ) ? "block" : "none";
+            }
+            if (renderPanel) {
+                renderPanel.style.display = (!sceneBuilderActive && isGenerateStep && projectId) ? "block" : "none";
+            }
+            if (advancedPanel) {
+                advancedPanel.style.display = (
+                    !sceneBuilderActive &&
+                    advancedFlowEnabled &&
+                    isGenerateStep &&
+                    projectId
+                ) ? "block" : "none";
+            }
+            if (previewPanel) {
+                previewPanel.style.display = (advancedFlowEnabled && !sceneBuilderActive) ? "block" : "none";
+            }
+            if (workflowLayout) {
+                workflowLayout.style.gridTemplateColumns = (advancedFlowEnabled && !sceneBuilderActive)
+                    ? "300px 1fr 420px"
+                    : "300px 1fr";
+            }
+
+            const simpleOnlyButtons = [
+                "btn-estimate",
+                "btn-snapshot",
+                "btn-refresh-snapshots",
+                "btn-export"
+            ];
+            simpleOnlyButtons.forEach(id => {
+                const el = $(id);
+                if (el) {
+                    el.style.display = advancedFlowEnabled ? "inline-flex" : "none";
+                }
+            });
+
+            const renderBtn = $("btn-render");
+            if (renderBtn) {
+                renderBtn.disabled = !projectId;
+            }
+            renderStepActions(sceneBuilderActive ? "scene_builder" : step.key);
+        }
+
+        function renderStepActions(stepKey) {
+            const backBtn = $("btn-back");
+            const saveBtn = $("btn-save");
+            const skipBtn = $("btn-skip");
+            const surpriseBtn = $("btn-surprise");
+            const nextBtn = $("btn-next");
+            const isGenerate = stepKey === "review";
+
+            if (backBtn) backBtn.style.display = "inline-flex";
+            if (stepKey === "scene_builder") {
+                if (backBtn) backBtn.style.display = "none";
+                if (saveBtn) saveBtn.style.display = "none";
+                if (skipBtn) skipBtn.style.display = "none";
+                if (surpriseBtn) surpriseBtn.style.display = "none";
+                if (nextBtn) nextBtn.style.display = "none";
+                return;
+            }
+            if (isGenerate) {
+                if (saveBtn) saveBtn.style.display = "none";
+                if (skipBtn) skipBtn.style.display = "none";
+                if (surpriseBtn) surpriseBtn.style.display = "none";
+                if (nextBtn) nextBtn.style.display = "none";
+                return;
+            }
+
+            if (saveBtn) saveBtn.style.display = "inline-flex";
+            if (nextBtn) nextBtn.style.display = "inline-flex";
+
+            if (stepKey === "brief") {
+                if (skipBtn) skipBtn.style.display = advancedFlowEnabled ? "inline-flex" : "none";
+                if (surpriseBtn) surpriseBtn.style.display = advancedFlowEnabled ? "inline-flex" : "none";
+                return;
+            }
+            if (stepKey === "characters") {
+                if (skipBtn) skipBtn.style.display = "inline-flex";
+                if (surpriseBtn) surpriseBtn.style.display = "none";
+                return;
+            }
+
+            if (skipBtn) skipBtn.style.display = "inline-flex";
+            if (surpriseBtn) surpriseBtn.style.display = "inline-flex";
+        }
+
+        function renderSceneLocks() {
+            const container = $("scene-locks");
+            container.innerHTML = "";
+            if (!projectId || !manifest.scenes || !manifest.scenes.length) {
+                container.innerHTML = "<p class='hint'>No scenes yet. Use Save/Skip/Surprise in Scene step first.</p>";
+                return;
+            }
+            manifest.scenes.forEach(scene => {
+                const variants = (manifest.scene_variants && manifest.scene_variants[scene.scene_id]) || [];
+                const trims = (manifest.timeline && manifest.timeline.scene_trims && manifest.timeline.scene_trims[scene.scene_id]) || {};
+                const variantButtons = variants.map(v => {
+                    const variantId = v.variant_id;
+                    return `<button class="btn btn-secondary" data-activate-variant="${scene.scene_id}" data-variant-id="${variantId}">Use ${variantId}</button>`;
+                }).join("");
+                const card = document.createElement("div");
+                card.className = "scene-card";
+                card.innerHTML = `
+                    <div class="scene-head">
+                        <strong>${scene.scene_id || "scene"}</strong>
+                        <span>${scene.state || (scene.locked ? "locked" : "planned")}</span>
+                    </div>
+                    <div class="hint">${scene.scene_goal || "-"}</div>
+                    <div class="actions">
+                        <button class="btn ${scene.locked ? "btn-secondary" : "btn-primary"}" data-scene="${scene.scene_id}" data-lock="${!scene.locked}">
+                            ${scene.locked ? "Unlock Scene" : "Lock Scene"}
+                        </button>
+                        <button class="btn btn-secondary" data-scene-approve="${scene.scene_id}" data-approved="${scene.state === "approved" || scene.state === "locked" || scene.state === "stitched" ? "false" : "true"}">
+                            ${scene.state === "approved" || scene.state === "locked" || scene.state === "stitched" ? "Unapprove" : "Approve"}
+                        </button>
+                        <button class="btn btn-secondary" data-open-scene-builder="${scene.scene_id}">Edit Scene</button>
+                        <button class="btn btn-secondary" data-scene-regen="${scene.scene_id}" data-branch="false">Regenerate</button>
+                        <button class="btn btn-secondary" data-scene-regen="${scene.scene_id}" data-branch="true">Branch Variant</button>
+                    </div>
+                    <div class="grid">
+                        <div><label>Trim Start (s)</label><input type="number" step="0.1" data-trim-start="${scene.scene_id}" value="${trims.start_trim || 0}"></div>
+                        <div><label>Trim End (s)</label><input type="number" step="0.1" data-trim-end="${scene.scene_id}" value="${trims.end_trim || 0}"></div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-secondary" data-save-trim="${scene.scene_id}">Save Trim</button>
+                    </div>
+                    ${variantButtons ? `<div class="actions">${variantButtons}</div>` : ""}
+                `;
+                container.appendChild(card);
+            });
+            container.querySelectorAll("button[data-scene]").forEach(btn => {
+                btn.onclick = () => toggleSceneLock(btn.dataset.scene, btn.dataset.lock === "true");
+            });
+            container.querySelectorAll("button[data-scene-approve]").forEach(btn => {
+                btn.onclick = () => approveScene(btn.dataset.sceneApprove, btn.dataset.approved === "true");
+            });
+            container.querySelectorAll("button[data-scene-regen]").forEach(btn => {
+                btn.onclick = () => regenerateScene(btn.dataset.sceneRegen, btn.dataset.branch === "true");
+            });
+            container.querySelectorAll("button[data-activate-variant]").forEach(btn => {
+                btn.onclick = () => activateVariant(btn.dataset.activateVariant, btn.dataset.variantId);
+            });
+            container.querySelectorAll("button[data-save-trim]").forEach(btn => {
+                btn.onclick = () => {
+                    const sceneId = btn.dataset.saveTrim;
+                    const startInput = container.querySelector(`input[data-trim-start="${sceneId}"]`);
+                    const endInput = container.querySelector(`input[data-trim-end="${sceneId}"]`);
+                    const startTrim = Number(startInput && startInput.value ? startInput.value : 0);
+                    const endTrim = Number(endInput && endInput.value ? endInput.value : 0);
+                    setSceneTrim(sceneId, startTrim, endTrim);
+                };
+            });
+            container.querySelectorAll("button[data-open-scene-builder]").forEach(btn => {
+                btn.onclick = () => openSceneBuilderEditor(btn.dataset.openSceneBuilder);
+            });
+        }
+
+        async function toggleSceneLock(sceneId, locked) {
+            try {
+                const response = await fetch(`/api/v2/projects/${projectId}/scenes/${sceneId}/lock`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ locked })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Failed to lock scene.");
+                applyResponse(data);
+                setStatus(`Scene ${sceneId} ${locked ? "locked" : "unlocked"}.`);
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function regenerateScene(sceneId, branch) {
+            try {
+                const response = await fetch(`/api/v2/projects/${projectId}/scenes/${sceneId}/regenerate`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ branch, activate: !branch })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Scene regeneration failed.");
+                applyResponse(data);
+                setStatus(branch ? `Created branch variant for ${sceneId}.` : `Regenerated ${sceneId}.`);
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function regenerateSceneVideo(sceneId) {
+            try {
+                if (!projectId) throw new Error("Create a project first.");
+                $("job-status").textContent = `Submitting ${sceneId} regenerate job...`;
+                const response = await fetch(`/api/v2/projects/${projectId}/scenes/${sceneId}/regenerate-video`, {
+                    method: "POST"
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Scene video regeneration failed.");
+                if (data.job_id) {
+                    lastJobId = data.job_id;
+                    pollJob(lastJobId);
+                }
+                setStatus(`Queued video regeneration for ${sceneId}.`);
+            } catch (e) {
+                setStatus(e.message, true);
+                $("job-status").textContent = e.message;
+            }
+        }
+
+        function openSceneBuilderEditor(sceneId) {
+            if (!projectId) {
+                setStatus("Create a project first.", true);
+                return;
+            }
+            sceneBuilderFocusSceneId = String(sceneId || "").trim();
+            sidebarTab = "scene_builder";
+            renderCurrentStep();
+        }
+
+        function buildDialogueFromConversationLines(lines, scene) {
+            const cast = Array.isArray(scene && scene.characters_in_scene) && scene.characters_in_scene.length
+                ? scene.characters_in_scene
+                : ["narrator"];
+            const aliasToId = {};
+            (manifest.characters || []).forEach(character => {
+                if (!character || !character.character_id) return;
+                const id = String(character.character_id);
+                aliasToId[id.toLowerCase()] = id;
+                aliasToId[id.toLowerCase().replace(/^char_/, "")] = id;
+                const name = String(character.name || "").trim().toLowerCase();
+                if (name) {
+                    aliasToId[name] = id;
+                    aliasToId[name.replace(/\s+/g, "_")] = id;
+                }
+            });
+            const cleaned = (lines || []).map(line => String(line || "").trim()).filter(Boolean);
+            let cursor = 0;
+            return cleaned.map((raw, index) => {
+                let speaker = cast[index % cast.length] || "narrator";
+                let line = raw;
+                if (raw.includes(":")) {
+                    const [left, ...rest] = raw.split(":");
+                    const maybeLine = rest.join(":").trim();
+                    if (maybeLine) {
+                        const speakerKey = String(left || "").trim().toLowerCase().replace(/\s+/g, "_");
+                        line = maybeLine;
+                        if (aliasToId[speakerKey]) {
+                            speaker = aliasToId[speakerKey];
+                        } else if (["narrator", "voiceover", "on-screen_text"].includes(speakerKey)) {
+                            speaker = speakerKey;
+                        }
+                    }
+                }
+                const wordCount = Math.max(1, line.split(/\s+/).filter(Boolean).length);
+                const duration = Math.max(1.2, Math.min(4.5, wordCount * 0.34));
+                const start = Number(cursor.toFixed(2));
+                const end = Number((cursor + duration).toFixed(2));
+                cursor += duration;
+                return {
+                    speaker_id: speaker || "narrator",
+                    line,
+                    emotion: "natural",
+                    pause_notes: "",
+                    start_second: start,
+                    end_second: end
+                };
+            });
+        }
+
+        async function saveSceneBuilderFields(sceneId) {
+            try {
+                if (!projectId) throw new Error("Create a project first.");
+                const sceneType = normalizeSceneType(document.querySelector(`select[data-scene-type="${sceneId}"]`)?.value || "auto");
+                const scenePrompt = String(document.querySelector(`textarea[data-scene-prompt="${sceneId}"]`)?.value || "").trim();
+                const conversationText = String(document.querySelector(`textarea[data-scene-conversation="${sceneId}"]`)?.value || "").trim();
+                const conversation = conversationText
+                    ? conversationText.split(/\r?\n/).map(line => line.trim()).filter(Boolean)
+                    : [];
+                const scene = (manifest.scenes || []).find(item => item && item.scene_id === sceneId) || {};
+                const dialogue = buildDialogueFromConversationLines(conversation, scene);
+                const payload = {
+                    scene_type: sceneType,
+                    scene_prompt: scenePrompt,
+                    scene_goal: scenePrompt,
+                    scene_description: scenePrompt,
+                    conversation,
+                    dialogue,
+                    events: scenePrompt ? [scenePrompt] : []
+                };
+                const response = await fetch(`/api/v2/projects/${projectId}/scenes/${sceneId}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Failed to save scene fields.");
+                applyResponse(data);
+                setStatus(`Saved prompt and conversation for ${sceneId}.`);
+                if (sidebarTab === "scene_builder") {
+                    const form = $("step-form");
+                    if (form) renderSceneBuilderInspector(form);
+                }
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function approveScene(sceneId, approved) {
+            try {
+                const response = await fetch(`/api/v2/projects/${projectId}/scenes/${sceneId}/approve`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ approved })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Scene approval failed.");
+                applyResponse(data);
+                setStatus(`${sceneId} ${approved ? "approved" : "set to planned"}.`);
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function setSceneTrim(sceneId, startTrim, endTrim) {
+            try {
+                const response = await fetch(`/api/v2/projects/${projectId}/scenes/${sceneId}/trim`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ start_trim: startTrim, end_trim: endTrim })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Scene trim update failed.");
+                applyResponse(data);
+                setStatus(`Updated trims for ${sceneId}.`);
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function saveGenerationMode() {
+            try {
+                const modeEl = $("generation_mode_select");
+                const mode = modeEl ? modeEl.value : "auto";
+                const response = await fetch(`/api/v2/projects/${projectId}/generation-mode`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ generation_mode: mode })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Generation mode update failed.");
+                applyResponse(data);
+                setStatus(`Generation mode set to ${mode}.`);
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function saveSceneArrangement() {
+            try {
+                if (!projectId) throw new Error("Create a project first.");
+                syncSceneArrangeDraft(false);
+                if (!sceneArrangeDraft.length) throw new Error("No scenes to arrange.");
+                const response = await fetch(`/api/v2/projects/${projectId}/steps/scenes`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ scenes: sceneArrangeDraft })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Failed to save arrangement.");
+                applyResponse(data);
+                setStatus("Scene arrangement saved.");
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function ensureScriptApprovedForRender() {
+            if (manifest.approvals && manifest.approvals.script_approved) return;
+            const response = await fetch(`/api/v2/projects/${projectId}/approvals/script`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ approved: true })
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || "Failed to auto-approve script.");
+            }
+            applyResponse(data);
+        }
+
+        async function saveSubtitleLine(sceneId, lineIndex) {
+            try {
+                const textEl = document.querySelector(`input[data-subtitle-scene="${sceneId}"][data-subtitle-index="${lineIndex}"]`);
+                const startEl = document.querySelector(`input[data-subtitle-start="${sceneId}"][data-subtitle-index="${lineIndex}"]`);
+                const endEl = document.querySelector(`input[data-subtitle-end="${sceneId}"][data-subtitle-index="${lineIndex}"]`);
+                const payload = {
+                    line: textEl ? textEl.value : "",
+                    start_second: Number(startEl && startEl.value ? startEl.value : 0),
+                    end_second: Number(endEl && endEl.value ? endEl.value : 0)
+                };
+                const response = await fetch(`/api/v2/projects/${projectId}/scenes/${sceneId}/dialogue/${lineIndex}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Subtitle line update failed.");
+                applyResponse(data);
+                setStatus(`Updated subtitle line ${lineIndex + 1} in ${sceneId}.`);
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function setScriptApproval(approved) {
+            try {
+                const response = await fetch(`/api/v2/projects/${projectId}/approvals/script`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ approved })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Script approval update failed.");
+                applyResponse(data);
+                setStatus(approved ? "Script approved for render." : "Script reopened for editing.");
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function activateVariant(sceneId, variantId) {
+            try {
+                const response = await fetch(`/api/v2/projects/${projectId}/scenes/${sceneId}/variants/${variantId}/activate`, {
+                    method: "POST"
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Variant activation failed.");
+                applyResponse(data);
+                setStatus(`Activated ${variantId} for ${sceneId}.`);
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        function populateAdvancedEditors() {
+            const timelineEl = $("timeline-json");
+            const bibleEl = $("bible-json");
+            if (timelineEl) timelineEl.value = JSON.stringify(manifest.timeline || {}, null, 2);
+            if (bibleEl) bibleEl.value = JSON.stringify(manifest.character_bible || {}, null, 2);
+        }
+
+        async function saveTimeline() {
+            try {
+                const timeline = parseJSONSafe($("timeline-json").value, {});
+                const response = await fetch(`/api/v2/projects/${projectId}/timeline`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ timeline })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Timeline save failed.");
+                applyResponse(data);
+                setStatus("Timeline updated.");
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function saveCharacterBible() {
+            try {
+                const character_bible = parseJSONSafe($("bible-json").value, {});
+                const response = await fetch(`/api/v2/projects/${projectId}/character-bible`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ character_bible })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Character bible save failed.");
+                applyResponse(data);
+                setStatus("Character bible updated.");
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function startRender() {
+            try {
+                if (!projectId) throw new Error("Create a project first.");
+                syncSceneArrangeDraft(false);
+                if (hasSceneArrangementChanges()) {
+                    await saveSceneArrangement();
+                }
+                await ensureScriptApprovedForRender();
+                $("job-status").textContent = "Submitting render job...";
+                const response = await fetch(`/api/v2/projects/${projectId}/render`, { method: "POST" });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Render enqueue failed.");
+                lastJobId = data.job_id;
+                pollJob(lastJobId);
+            } catch (e) {
+                $("job-status").textContent = e.message;
+            }
+        }
+
+        async function controlJob(action) {
+            try {
+                if (!lastJobId) throw new Error("No active job yet.");
+                const response = await fetch(`/api/v2/jobs/${lastJobId}/${action}`, {
+                    method: "POST"
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || `Failed to ${action} job.`);
+                $("job-status").textContent = `Job ${data.job_id}: ${data.status}`;
+            } catch (e) {
+                $("job-status").textContent = e.message;
+            }
+        }
+
+        async function refreshProjectStateForPolling() {
+            if (!projectId) return;
+            try {
+                const response = await fetch(`/api/v2/projects/${projectId}`);
+                const data = await response.json();
+                if (!response.ok) return;
+                manifest = data.manifest || manifest;
+                completion = data.completion || completion;
+                syncSceneArrangeDraft(false);
+                renderPreview();
+                renderGeneratedClipsInline();
+                if (sidebarTab === "scene_builder") {
+                    const form = $("step-form");
+                    if (form) renderSceneBuilderInspector(form);
+                }
+            } catch (e) {
+                // Keep polling resilient; skip transient project refresh errors.
+            }
+        }
+
+        async function pollJob(jobId) {
+            if (activePollTimer) {
+                clearInterval(activePollTimer);
+                activePollTimer = null;
+            }
+            pollInFlight = false;
+            activePollTimer = setInterval(async () => {
+                if (pollInFlight) return;
+                pollInFlight = true;
+                try {
+                    const response = await fetch(`/api/v2/jobs/${jobId}`);
+                    const data = await response.json();
+                    if (!response.ok) {
+                        $("job-status").textContent = data.error || "Job polling failed.";
+                        clearInterval(activePollTimer);
+                        activePollTimer = null;
+                        return;
+                    }
+                    lastJobSnapshot = data;
+                    const stage = data.current_stage ? ` | ${data.current_stage}` : "";
+                    const scene = data.current_scene_id ? ` | ${data.current_scene_id}` : "";
+                    let statusText = `Job ${data.job_id}: ${data.status} (${Math.round((data.progress || 0) * 100)}%)${stage}${scene}`;
+                    if (data.current_stage === "awaiting_scene_approval" && data.current_scene_id) {
+                        statusText += " | review the clip, then click Resume or approve the scene below to continue";
+                    }
+                    $("job-status").textContent = statusText;
+                    const warningEl = $("job-warning-log");
+                    if (warningEl) {
+                        const warnings = Array.isArray(data.warnings) ? data.warnings : [];
+                        const errors = Array.isArray(data.errors) ? data.errors : [];
+                        const lines = [];
+                        if (errors.length) {
+                            lines.push("Errors:");
+                            errors.slice(-5).forEach(item => lines.push(`- ${item}`));
+                        }
+                        if (warnings.length) {
+                            lines.push("Warnings:");
+                            warnings.slice(-6).forEach(item => {
+                                lines.push(`- [${item.category || "warning"}] ${item.message || ""}`);
+                            });
+                        }
+                        warningEl.textContent = lines.join("\n");
+                    }
+
+                    const step = currentStepDef();
+                    if ((step && step.key === "review") || sidebarTab === "scene_builder") {
+                        await refreshProjectStateForPolling();
+                    }
+
+                    if (data.status === "completed" || data.status === "failed" || data.status === "cancelled") {
+                        clearInterval(activePollTimer);
+                        activePollTimer = null;
+                        await refreshArtifacts();
+                    }
+                } finally {
+                    pollInFlight = false;
+                }
+            }, 2500);
+        }
+
+        async function refreshArtifacts() {
+            if (!projectId) return;
+            const response = await fetch(`/api/v2/projects/${projectId}/artifacts`);
+            const data = await response.json();
+            const list = $("artifact-list");
+            list.innerHTML = "";
+            if (!response.ok) {
+                list.textContent = data.error || "Failed to fetch artifacts.";
+                artifactsCache = [];
+                return;
+            }
+            artifactsCache = Array.isArray(data.artifacts) ? data.artifacts : [];
+            let latestVideoUrl = "";
+            artifactsCache.forEach(item => {
+                const link = document.createElement("a");
+                link.href = item.url;
+                link.textContent = `${item.type}: ${item.path}`;
+                link.target = "_blank";
+                list.appendChild(link);
+                if (
+                    item.type === "video" &&
+                    item.path.endsWith("_final.mp4")
+                ) {
+                    latestVideoUrl = item.url;
+                }
+            });
+            if (latestVideoUrl) {
+                const player = $("preview-player");
+                if (player) {
+                    player.src = latestVideoUrl;
+                }
+            }
+            renderGeneratedClipsInline();
+            if (sidebarTab === "scene_builder") {
+                const form = $("step-form");
+                if (form) renderSceneBuilderInspector(form);
+            }
+        }
+
+        async function estimateProject() {
+            try {
+                if (!projectId) throw new Error("Create a project first.");
+                const response = await fetch(`/api/v2/projects/${projectId}/estimate`);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Estimate failed.");
+                $("estimate-output").textContent = JSON.stringify(data, null, 2);
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function createSnapshot() {
+            try {
+                if (!projectId) throw new Error("Create a project first.");
+                const response = await fetch(`/api/v2/projects/${projectId}/snapshots`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ label: "manual_snapshot" })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Snapshot failed.");
+                setStatus(`Snapshot created: ${data.snapshot_id}`);
+                await refreshSnapshots();
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function refreshSnapshots() {
+            try {
+                if (!projectId) return;
+                const response = await fetch(`/api/v2/projects/${projectId}/snapshots`);
+                const data = await response.json();
+                const list = $("snapshot-list");
+                list.innerHTML = "";
+                if (!response.ok) throw new Error(data.error || "Snapshot fetch failed.");
+                (data.snapshots || []).forEach(item => {
+                    const row = document.createElement("div");
+                    row.className = "actions";
+                    row.innerHTML = `
+                        <span class="hint">${item.snapshot_id} (${item.label})</span>
+                        <button class="btn btn-secondary" data-rollback="${item.snapshot_id}">Rollback</button>
+                    `;
+                    list.appendChild(row);
+                });
+                list.querySelectorAll("button[data-rollback]").forEach(btn => {
+                    btn.onclick = () => rollbackSnapshot(btn.dataset.rollback);
+                });
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function rollbackSnapshot(snapshotId) {
+            try {
+                const response = await fetch(`/api/v2/projects/${projectId}/snapshots/${snapshotId}/rollback`, {
+                    method: "POST"
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Rollback failed.");
+                applyResponse(data);
+                setStatus(`Rolled back to ${snapshotId}.`);
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        async function exportBundle() {
+            try {
+                if (!projectId) throw new Error("Create a project first.");
+                const response = await fetch(`/api/v2/projects/${projectId}/export`, {
+                    method: "POST"
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || "Export failed.");
+                const list = $("artifact-list");
+                if (list && data.bundle) {
+                    const link = document.createElement("a");
+                    link.href = data.bundle.url;
+                    link.textContent = `export: ${data.bundle.path}`;
+                    link.target = "_blank";
+                    list.prepend(link);
+                }
+                setStatus("Export bundle created.");
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        function validateBriefLocal() {
+            const brief = manifest.brief || {};
+            return requiredBriefFields.filter(key => !brief[key]);
+        }
+
+        $("btn-back").onclick = () => {
+            sidebarTab = "workflow";
+            if (currentStep > 0) currentStep -= 1;
+            renderCurrentStep();
+        };
+        $("btn-next").onclick = () => {
+            sidebarTab = "workflow";
+            const visible = getVisibleSteps();
+            if (currentStep < visible.length - 1) currentStep += 1;
+            renderCurrentStep();
+        };
+        $("btn-toggle-advanced-flow").onclick = () => {
+            sidebarTab = "workflow";
+            advancedFlowEnabled = !advancedFlowEnabled;
+            const visible = getVisibleSteps();
+            if (currentStep >= visible.length) currentStep = visible.length - 1;
+            renderCurrentStep();
+        };
+        $("btn-save").onclick = saveStep;
+        $("btn-skip").onclick = skipStep;
+        $("btn-surprise").onclick = surpriseStep;
+        $("btn-render").onclick = startRender;
+        $("btn-pause-job").onclick = () => controlJob("pause");
+        $("btn-resume-job").onclick = () => controlJob("resume");
+        $("btn-cancel-job").onclick = () => controlJob("cancel");
+        $("btn-refresh-artifacts").onclick = refreshArtifacts;
+        $("btn-estimate").onclick = estimateProject;
+        $("btn-snapshot").onclick = createSnapshot;
+        $("btn-refresh-snapshots").onclick = refreshSnapshots;
+        $("btn-export").onclick = exportBundle;
+        $("btn-save-timeline").onclick = saveTimeline;
+        $("btn-save-bible").onclick = saveCharacterBible;
+        $("btn-back-home").onclick = goHome;
+        $("btn-open-workflow-tab").onclick = () => {
+            sidebarTab = "workflow";
+            renderCurrentStep();
+        };
+        $("btn-open-scene-builder-tab").onclick = () => {
+            if (!projectId) {
+                setStatus("Create a project first to inspect scene builder output.", true);
+                return;
+            }
+            sidebarTab = "scene_builder";
+            renderCurrentStep();
+        };
+        $("btn-open-quickstart").onclick = () => {
+            sidebarTab = "workflow";
+            enterWorkflow(false);
+            currentStep = 0;
+            setQuickstartVisible(true);
+            renderCurrentStep();
+        };
+
+        $("btn-quickstart-create").onclick = createProjectFromQuickstart;
+        $("btn-quickstart-manual").onclick = () => {
+            setQuickstartVisible(false);
+            currentStep = 0;
+            renderCurrentStep();
+        };
+        $("btn-single-video-generate").onclick = generateSingleVideo;
+        ["btn-home-start-top", "btn-home-start-primary", "btn-home-start-secondary"].forEach(id => {
+            const el = $(id);
+            if (!el) return;
+            el.onclick = () => enterWorkflow(true);
+        });
+        const detailsBtn = $("btn-home-scroll-details");
+        if (detailsBtn) {
+            detailsBtn.onclick = () => {
+                const target = $("home-details");
+                if (target) {
+                    target.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            };
+        }
+
+        renderCurrentStep();
+        renderPreview();
+        populateAdvancedEditors();
+        goHome();
+    </script>
+</body>
+</html>
