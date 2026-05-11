@@ -1,34 +1,45 @@
 # GemVideo Generator
 
-GemVideo Generator is a Flask-based AI video generation prototype for turning prompts, scripts, and scene plans into structured video-generation jobs.
+GemVideo Generator is a Flask-based AI video generation prototype for turning user prompts, scripts, and scene plans into structured video generation jobs. It is designed as a portfolio-ready backend and web interface for experimenting with prompt-to-video workflows, provider configuration, scene planning, and local render orchestration.
 
-## Overview
+## What This Project Does
 
-The project provides a local web interface and API routes for prompt-driven video workflows. It supports project/job control, scene regeneration, timeline edits, character-bible style consistency, and provider configuration for Gemini/OpenAI-style video generation services.
+The app accepts high-level creative input and breaks it into a more controlled video-production workflow. Instead of treating video generation as a single prompt, it models projects, jobs, scenes, manifests, safety checks, provider calls, and render state. That structure makes it easier to regenerate individual scenes, adjust timeline details, keep character descriptions consistent, and test generation providers without rewriting the whole app.
 
-## Features
+## Key Features
 
-- Prompt-to-video generation workflow.
-- V2 project and job APIs.
+- Flask web application with a local browser interface.
+- V2 project and job APIs for managing video generation work.
+- Scene planning services for prompt expansion and structured descriptions.
 - Scene-level regenerate, pause, resume, and cancel controls.
-- Timeline and transition editing endpoints.
-- Character-bible memory for visual consistency.
-- Local render-runner mode for development.
-- Optional cloud TTS/video provider configuration.
+- Manifest schema for tracking jobs, scenes, assets, and render state.
+- Character-bible style consistency support across scenes.
+- Safety and validation services before generation.
+- Optional provider clients for Gemini/Veo, OpenAI-style video APIs, and voice generation.
+- Local render-runner mode for development without requiring real provider calls.
+- Unit tests covering planning, rendering, safety, and V2 API behaviour.
 
-## Project Structure
+## Tech Stack
+
+- Python
+- Flask
+- Pydantic-style schema organisation
+- Provider service layer for AI/video integrations
+- Pytest-compatible tests
+
+## Repository Structure
 
 ```text
-app.py
-application.py
-config.py
-index.html
-routes/
-schemas/
-services/
-tests/
-VIDEO_BUILDER_V2_SETUP.md
-requirements.txt
+app.py                         # Flask application entry point
+application.py                 # Alternate runtime entry point
+config.py                      # Environment-driven app configuration
+index.html                     # Local web interface
+routes/                        # API route modules
+schemas/                       # Manifest and request/response structures
+services/                      # Planning, rendering, safety, provider, and storage logic
+tests/                         # Automated tests
+VIDEO_BUILDER_V2_SETUP.md      # Additional setup notes for the V2 workflow
+requirements.txt               # Python dependencies
 ```
 
 ## Setup
@@ -38,23 +49,46 @@ python -m venv .venv
 .venv\Scripts\activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+copy .env.example .env
 ```
 
-On macOS/Linux:
+On macOS/Linux, activate the environment with:
 
 ```bash
 source .venv/bin/activate
 ```
 
-Create a `.env` file from `.env.example` and add your own API keys.
+Then edit `.env` with your own API keys if you want to test real provider integrations. Leave `ENABLE_REAL_GENERATION=false` for local development without external generation calls.
 
-## Run
+## Run Locally
 
 ```bash
 python application.py
 ```
 
-## Public Repo Notes
+Open the local URL printed by Flask in your browser.
 
-Uploads, generated videos, output files, temp folders, local `.env` files, and cache folders are intentionally excluded from this repository.
+## Test
 
+```bash
+pytest
+```
+
+## Environment Variables
+
+The repo includes `.env.example` only. Real keys should stay local and must not be committed.
+
+Common variables:
+
+- `GEMINI_API_KEY`
+- `OPENAI_API_KEY`
+- `ELEVENLABS_API_KEY`
+- `DATA_DIR`
+- `OUTPUT_DIR`
+- `UPLOAD_DIR`
+- `ENABLE_REAL_GENERATION`
+- `VEO_MODEL_NAME`
+
+## Public Repository Notes
+
+This cleaned version intentionally excludes local `.env` files, uploads, generated videos, provider outputs, temp folders, caches, and virtual environments. The repository is intended to show application structure, service design, and AI workflow orchestration without publishing private keys or generated media.
